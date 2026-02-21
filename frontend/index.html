@@ -606,7 +606,173 @@
             }
         })();
 
-        const API_URL = '/api';
+        // ISO-Wochenschlüssel (Jahr-Woche) für 4-Tage-Woche-Berechnung
+        function getISOWeekKey(date) {
+            const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+            const day = d.getUTCDay() || 7;
+            d.setUTCDate(d.getUTCDate() + 4 - day);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+            return `${d.getUTCFullYear()}-${weekNo}`;
+        }
+
+        // Osterformel (Gauss)
+        function getEaster(year) {
+            const a = year % 19, b = Math.floor(year / 100), c = year % 100;
+            const d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25);
+            const g = Math.floor((b - f + 1) / 3);
+            const h = (19 * a + b - d - g + 15) % 30;
+            const i = Math.floor(c / 4), k = c % 4;
+            const l = (32 + 2 * e + 2 * i - h - k) % 7;
+            const m = Math.floor((a + 11 * h + 22 * l) / 451);
+            const month = Math.floor((h + l - 7 * m + 114) / 31);
+            const day = ((h + l - 7 * m + 114) % 31) + 1;
+            return new Date(Date.UTC(year, month - 1, day));
+        }
+
+        function easterPlus(easter, days) {
+            const d = new Date(easter);
+            d.setUTCDate(d.getUTCDate() + days);
+            return d.toISOString().substring(0, 10);
+        }
+
+        function pad(n) { return String(n).padStart(2, '0'); }
+        function fixed(year, month, day) { return `${year}-${pad(month)}-${pad(day)}`; }
+
+        function getBussUndBettag(year) {
+            const nov23 = new Date(Date.UTC(year, 10, 23));
+            const dow = nov23.getUTCDay();
+            const daysBack = dow === 3 ? 7 : (dow - 3 + 7) % 7;
+            const d = new Date(Date.UTC(year, 10, 23 - daysBack));
+            return d.toISOString().substring(0, 10);
+        }
+
+        function getGermanHolidays(startYear, endYear, bundesland) {
+            const set = new Set();
+            const bl = bundesland ? bundesland.toUpperCase() : null;
+
+            for (let y = startYear; y <= endYear; y++) {
+                const e = getEaster(y);
+
+                // Bundesweite Feiertage
+                set.add(fixed(y, 1, 1));          // Neujahr
+                set.add(easterPlus(e, -2));        // Karfreitag
+                set.add(easterPlus(e, 1));         // Ostermontag
+                set.add(fixed(y, 5, 1));           // Tag der Arbeit
+                set.add(easterPlus(e, 39));        // Christi Himmelfahrt
+                set.add(easterPlus(e, 50));        // Pfingstmontag
+                set.add(fixed(y, 10, 3));          // Tag der Deutschen Einheit
+                set.add(fixed(y, 12, 25));         // 1. Weihnachtstag
+                set.add(fixed(y, 12, 26));         // 2. Weihnachtstag
+
+                if (!bl) continue;
+
+                // Heilige Drei Könige (6. Jan)
+                if (['BW','BY','ST'].includes(bl))
+                    set.add(fixed(y, 1, 6));
+
+                // Internationaler Frauentag (8. März)
+                if (['BE','MV'].includes(bl))
+                    set.add(fixed(y, 3, 8));
+
+                // Ostersonntag
+                if (bl === 'BB')
+                    set.add(easterPlus(e, 0));
+
+                // Pfingstsonntag
+                if (bl === 'BB')
+                    set.add(easterPlus(e, 49));
+
+                // Fronleichnam (Ostern +60)
+                if (['BW','BY','HE','NW','RP','SL'].includes(bl))
+                    set.add(easterPlus(e, 60));
+
+                // Mariae Himmelfahrt (15. Aug)
+                if (['BY','SL'].includes(bl))
+                    set.add(fixed(y, 8, 15));
+
+                // Weltkindertag (20. Sep) - TH seit 2019
+                if (bl === 'TH' && y >= 2019)
+                    set.add(fixed(y, 9, 20));
+
+                // Reformationstag (31. Okt)
+                if (['BB','HB','HH','MV','NI','SN','ST','SH','TH'].includes(bl))
+                    set.add(fixed(y, 10, 31));
+
+                // Allerheiligen (1. Nov)
+                if (['BW','BY','NW','RP','SL'].includes(bl))
+                    set.add(fixed(y, 11, 1));
+
+                // Buß- und Bettag (Mittwoch vor 23. Nov)
+                if (bl === 'SN')
+                    set.add(getBussUndBettag(y));
+            }
+            return set;
+        }
+
+        function calculateWorkdays(formData) {
+            const start = new Date(formData.start_date + 'T00:00:00Z');
+            const end = new Date(formData.end_date + 'T00:00:00Z');
+
+            if (start > end) throw new Error('Startdatum muss vor dem Enddatum liegen');
+
+            const germanHolidays = getGermanHolidays(
+                start.getUTCFullYear(), end.getUTCFullYear(), formData.bundesland || null
+            );
+            const customClosed = new Set(formData.custom_closed_dates || []);
+
+            let totalWorkdays = 0, weekendDays = 0, publicHolidaysCount = 0, customClosedCount = 0;
+            const workdaysPerWeek = {};
+            const current = new Date(start);
+
+            while (current <= end) {
+                const dateStr = current.toISOString().substring(0, 10);
+                const dow = current.getUTCDay();
+                if (dow === 0 || dow === 6) {
+                    weekendDays++;
+                } else if (germanHolidays.has(dateStr)) {
+                    publicHolidaysCount++;
+                } else if (customClosed.has(dateStr)) {
+                    customClosedCount++;
+                } else {
+                    totalWorkdays++;
+                    const wk = getISOWeekKey(current);
+                    workdaysPerWeek[wk] = (workdaysPerWeek[wk] || 0) + 1;
+                }
+                current.setUTCDate(current.getUTCDate() + 1);
+            }
+
+            const totalCalendarDays = Math.round((end - start) / 86400000) + 1;
+
+            let fourDayWeekOffDays = 0;
+            if (formData.four_day_week) {
+                for (const count of Object.values(workdaysPerWeek)) {
+                    if (count > 4) fourDayWeekOffDays += count - 4;
+                }
+                totalWorkdays -= fourDayWeekOffDays;
+            }
+
+            const availableWorkdays = totalWorkdays - formData.vacation_days - formData.sick_days;
+            if (availableWorkdays < 0) throw new Error('Urlaub und Krankheitstage übersteigen die verfügbaren Arbeitstage');
+            if (formData.home_office_days > availableWorkdays) throw new Error('Home Office Tage können die verfügbaren Arbeitstage nicht überschreiten');
+
+            const requiredOfficeDays = availableWorkdays - formData.home_office_days;
+            const officePercentage = availableWorkdays > 0 ? requiredOfficeDays / availableWorkdays * 100 : 0;
+
+            return {
+                total_calendar_days: totalCalendarDays,
+                total_workdays: totalWorkdays,
+                required_office_days: requiredOfficeDays,
+                home_office_days: formData.home_office_days,
+                vacation_days: formData.vacation_days,
+                sick_days: formData.sick_days,
+                weekend_days: weekendDays,
+                public_holidays: publicHolidaysCount,
+                custom_closed_days: customClosedCount,
+                four_day_week_off_days: fourDayWeekOffDays,
+                office_attendance_percentage: Math.round(officePercentage * 100) / 100,
+            };
+        }
 
         // Tab switching
         function switchTab(tabName) {
@@ -690,10 +856,9 @@
             document.getElementById('endDate').value = lastDay.toISOString().split('T')[0];
         }
 
-        document.getElementById('planForm').addEventListener('submit', async (e) => {
+        document.getElementById('planForm').addEventListener('submit', (e) => {
             e.preventDefault();
-            
-            const bundesland = document.getElementById('bundesland').value;
+
             const formData = {
                 start_date: document.getElementById('startDate').value,
                 end_date: document.getElementById('endDate').value,
@@ -702,24 +867,11 @@
                 sick_days: parseInt(document.getElementById('sickDays').value),
                 four_day_week: document.getElementById('fourDayWeek').checked,
                 custom_closed_dates: [],
-                bundesland: bundesland || null
+                bundesland: document.getElementById('bundesland').value || null
             };
 
             try {
-                const response = await fetch(`${API_URL}/calculate`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData)
-                });
-
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.detail || 'Fehler bei der Berechnung');
-                }
-
-                const result = await response.json();
+                const result = calculateWorkdays(formData);
                 displayResults(result);
                 hideError();
             } catch (error) {

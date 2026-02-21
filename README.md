@@ -1,94 +1,46 @@
 # Workday Planner
 
-A self-hosted tool for workday planning and daily work time tracking. Calculate required office days, optimize home office usage, and track your daily hours.
+A simple, self-contained browser tool for workday planning and daily work time tracking. No server, no dependencies — just open the HTML file.
+
+**Live:** [https://&lt;dein-username&gt;.github.io/workday-planner](https://github.com)
 
 ## Features
 
 ### HO-Planer
 - Flexible date ranges with quick-select (current year, today to year end, next month)
-- 4-day work week support (per-week calculation, not a flat 20% cut)
-- German public holidays with per-state support (all 16 Bundeslaender)
-- Custom office closure dates
+- German public holidays — all 16 Bundesländer supported
+- 4-day work week support
 - Tracks home office, vacation, and sick days
-- Shows required office days per week and per month
+- Shows required office days total, per week, and per month
 
 ### Arbeitszeitrechner
 - Enter start time, end time, and break duration
-- "Jetzt" button to set end time to current time
-- Calculates gross time, break, and net working hours
-- Fully client-side, no backend needed
+- "Jetzt" button sets end time to current time
+- Shows gross time, break, and net working hours
 
-## Tech Stack
+## Usage
 
-- **Backend**: Python 3.11, FastAPI, [holidays](https://pypi.org/project/holidays/)
-- **Frontend**: HTML5, CSS3, Vanilla JavaScript
-- **Deployment**: Docker & Docker Compose, nginx reverse proxy
+Open [index.html](frontend/index.html) in any browser — no installation needed.
 
-## Quick Start
+Or use the live version on GitHub Pages.
 
-```bash
-docker-compose up --build -d
-```
+## Deployment
 
-The app is available at `http://<host>:80` by default.
+Pushes to `main` automatically deploy to GitHub Pages via GitHub Actions.
 
-### Custom Port
-
-Create a `.env` file next to `docker-compose.yml`:
-
-```
-PORT=8085
-```
-
-Or pass it inline (Linux/Mac):
-
-```bash
-PORT=8085 docker-compose up --build -d
-```
-
-### Stop
-
-```bash
-docker-compose down
-```
-
-## API
-
-### POST /api/calculate
-
-```json
-{
-  "start_date": "2026-01-01",
-  "end_date": "2026-12-31",
-  "home_office_days": 50,
-  "vacation_days": 25,
-  "sick_days": 5,
-  "four_day_week": false,
-  "custom_closed_dates": [],
-  "bundesland": "BY"
-}
-```
-
-`bundesland` is optional. Valid values: `BW`, `BY`, `BE`, `BB`, `HB`, `HH`, `HE`, `MV`, `NI`, `NW`, `RP`, `SL`, `SN`, `ST`, `SH`, `TH`. Omit for federal holidays only.
-
-### GET /api/health
-
-Health check endpoint.
+To enable GitHub Pages in a new repo:
+1. Go to **Settings → Pages**
+2. Set source to **GitHub Actions**
 
 ## Project Structure
 
 ```
 workday-planner/
-├── backend/
-│   ├── Dockerfile
-│   ├── main.py
-│   └── requirements.txt
 ├── frontend/
-│   ├── Dockerfile
-│   ├── index.html
-│   └── nginx.conf
-├── docker-compose.yml
-├── .env
+│   └── index.html
+├── .github/
+│   └── workflows/
+│       └── deploy.yml
 └── README.md
 ```
 

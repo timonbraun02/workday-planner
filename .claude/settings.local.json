@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cmd /c \"dir /s /a d:\\\\ho_planer\")",
+      "Bash(powershell -Command:*)"
+    ]
+  }
+}
