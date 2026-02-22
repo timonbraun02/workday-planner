@@ -364,6 +364,26 @@
             display: block;
         }
 
+        .warning {
+            background: #fff8e1;
+            border: 2px solid #ffe082;
+            color: #7a5c00;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .warning.show {
+            display: block;
+        }
+
+        body.dark .warning {
+            background: #2a2000;
+            border-color: #7a6000;
+            color: #ffd54f;
+        }
+
         @media (max-width: 600px) {
             .header h1 {
                 font-size: 1.5rem;
@@ -559,6 +579,7 @@
             </form>
 
             <div id="timeError" class="error"></div>
+            <div id="timeWarning" class="warning"></div>
 
             <div id="timeResults" class="results">
                 <h2>Ergebnis</h2>
@@ -822,8 +843,24 @@
             if (netMinutes < 0) {
                 document.getElementById('timeError').textContent = 'Pause ist länger als die Arbeitszeit';
                 document.getElementById('timeError').classList.add('show');
+                document.getElementById('timeWarning').classList.remove('show');
                 document.getElementById('timeResults').classList.remove('show');
                 return;
+            }
+
+            // ArbZG-Warnungen
+            const warnings = [];
+            if (grossMinutes > 9 * 60 && breakMin < 45)
+                warnings.push(`⚠ Bei mehr als 9h Arbeitszeit schreibt das Arbeitszeitgesetz mindestens 45 Minuten Pause vor (eingetragen: ${breakMin} min).`);
+            if (netMinutes > 10 * 60)
+                warnings.push(`⚠ Die Netto-Arbeitszeit überschreitet 10 Stunden — das ist nach ArbZG §3 nicht zulässig.`);
+
+            const warningDiv = document.getElementById('timeWarning');
+            if (warnings.length > 0) {
+                warningDiv.innerHTML = warnings.join('<br>');
+                warningDiv.classList.add('show');
+            } else {
+                warningDiv.classList.remove('show');
             }
 
             document.getElementById('grossTime').textContent = formatMinutes(grossMinutes);
