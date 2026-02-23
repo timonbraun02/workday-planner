@@ -36,16 +36,6 @@ A self-contained, single-file browser tool for home office planning and daily wo
 
 Open [index.html](frontend/index.html) in any browser — no installation needed.
 
-Or use the live version on GitHub Pages.
-
-## Deployment
-
-Pushes to `main` automatically deploy to GitHub Pages via GitHub Actions.
-
-To enable GitHub Pages in a new repo:
-1. Go to **Settings → Pages**
-2. Set source to **GitHub Actions**
-
 ## Project Structure
 
 ```
