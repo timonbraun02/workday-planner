@@ -384,6 +384,198 @@
             color: #ffd54f;
         }
 
+        /* Advanced HO Planer Styles */
+        .adv-settings {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: flex-end;
+            margin-bottom: 24px;
+            padding: 20px;
+            background: var(--bg-card);
+            border-radius: 12px;
+            box-shadow: var(--shadow-card);
+        }
+
+        .adv-settings .form-group {
+            flex: 1;
+            min-width: 160px;
+        }
+
+        .adv-budget {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .budget-chip {
+            flex: 1;
+            min-width: 120px;
+            padding: 14px 18px;
+            border-radius: 10px;
+            background: var(--bg-card);
+            box-shadow: var(--shadow-card);
+            text-align: center;
+        }
+
+        .budget-chip .chip-label {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .budget-chip .chip-value {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        .budget-chip.warning .chip-value {
+            color: #e65100;
+        }
+
+        body.dark .budget-chip.warning .chip-value {
+            color: #ffb74d;
+        }
+
+        .budget-chip.danger .chip-value {
+            color: #c62828;
+        }
+
+        body.dark .budget-chip.danger .chip-value {
+            color: #ef9a9a;
+        }
+
+        .adv-warning {
+            background: #fff3e0;
+            border: 2px solid #ffb300;
+            color: #7a4f00;
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin-bottom: 18px;
+            font-weight: 600;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        .adv-warning.show { display: block; }
+
+        .adv-danger {
+            background: #ffebee;
+            border: 2px solid #ef5350;
+            color: #b71c1c;
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin-bottom: 18px;
+            font-weight: 600;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        .adv-danger.show { display: block; }
+
+        body.dark .adv-warning {
+            background: #2a1a00;
+            border-color: #7a6000;
+            color: #ffd54f;
+        }
+
+        body.dark .adv-danger {
+            background: #2a0000;
+            border-color: #c62828;
+            color: #ef9a9a;
+        }
+
+        .chart-wrapper {
+            background: var(--bg-card);
+            border-radius: 12px;
+            box-shadow: var(--shadow-card);
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .chart-wrapper canvas {
+            width: 100% !important;
+            display: block;
+            cursor: grab;
+        }
+        .chart-wrapper canvas.dragging {
+            cursor: grabbing;
+        }
+
+        .month-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .month-card {
+            background: var(--bg-card);
+            border-radius: 10px;
+            box-shadow: var(--shadow-card);
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .month-card .month-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+
+        .month-card .month-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent);
+            min-width: 2ch;
+            text-align: center;
+        }
+
+        .month-card .month-value.over {
+            color: #c62828;
+        }
+
+        body.dark .month-card .month-value.over {
+            color: #ef9a9a;
+        }
+
+        .month-stepper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-step {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid var(--accent);
+            background: transparent;
+            color: var(--accent);
+            font-size: 1.2rem;
+            line-height: 1;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-step:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        .month-sub {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
         @media (max-width: 600px) {
             .header h1 {
                 font-size: 1.5rem;
@@ -410,6 +602,7 @@
         <div class="tab-nav">
             <button class="tab-btn active" onclick="switchTab('planer')">HO-Planer</button>
             <button class="tab-btn" onclick="switchTab('zeitrechner')">Arbeitszeitrechner</button>
+            <button class="tab-btn" onclick="switchTab('advanced')">Advanced HO Planer</button>
         </div>
 
         <div id="tab-planer" class="tab-content active">
@@ -609,6 +802,62 @@
             </div>
         </div>
         </div>
+
+        <!-- Advanced HO Day Planer Tab -->
+        <div id="tab-advanced" class="tab-content">
+        <div class="content">
+            <div class="form-section">
+                <h2>Advanced HO Day Planer</h2>
+                <p style="color: var(--text-muted); margin-bottom: 18px; font-size: 0.95rem;">
+                    Verplane deine HO-Tage grafisch auf die Monate. Gib dein Jahresbudget ein und verteile die Tage mit den Reglern.
+                </p>
+            </div>
+
+            <!-- Einstellungen -->
+            <div class="adv-settings">
+                <div class="form-group">
+                    <label for="advYear">Jahr</label>
+                    <input type="number" id="advYear" min="2020" max="2040" value="2026">
+                </div>
+                <div class="form-group">
+                    <label for="advBudget">Verfügbare HO-Tage (Jahresbudget)</label>
+                    <input type="number" id="advBudget" min="0" max="365" value="60">
+                </div>
+                <div class="form-group" style="flex: 0;">
+                    <label style="visibility:hidden">Reset</label>
+                    <button type="button" class="btn-primary" style="padding: 12px 24px; font-size: 0.95rem; width: auto;" onclick="advReset()">↺ Zurücksetzen</button>
+                </div>
+            </div>
+
+            <!-- Budget-Chips -->
+            <div class="adv-budget">
+                <div class="budget-chip">
+                    <div class="chip-label">Gesamtbudget</div>
+                    <div class="chip-value" id="advChipTotal">60</div>
+                </div>
+                <div class="budget-chip">
+                    <div class="chip-label">Verplant</div>
+                    <div class="chip-value" id="advChipUsed">0</div>
+                </div>
+                <div class="budget-chip" id="advChipRemCard">
+                    <div class="chip-label">Verbleibend</div>
+                    <div class="chip-value" id="advChipRem">60</div>
+                </div>
+            </div>
+
+            <!-- Warnungen -->
+            <div class="adv-warning" id="advWarn">⚠️ Du hast 90% deines HO-Budgets verplant!</div>
+            <div class="adv-danger" id="advDanger">🚨 Zu viele Tage verplant! Du überschreitest dein Budget um <span id="advOver">0</span> Tage.</div>
+
+            <!-- Canvas Chart -->
+            <div class="chart-wrapper">
+                <canvas id="advChart" height="320"></canvas>
+            </div>
+
+            <!-- Monats-Stepper -->
+            <div class="month-controls" id="advMonthControls"></div>
+        </div>
+        </div>
     </div>
 
     <script>
@@ -801,6 +1050,9 @@
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('tab-' + tabName).classList.add('active');
             event.currentTarget.classList.add('active');
+            if (tabName === 'advanced') {
+                requestAnimationFrame(() => advDrawChart());
+            }
         }
 
         // Arbeitszeitrechner
@@ -944,6 +1196,417 @@
         }
 
         setToYearEnd();
+
+        /* =========================================================
+           ADVANCED HO DAY PLANER
+           ========================================================= */
+        const MONTHS_DE = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+        const MONTHS_FULL = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+
+        let advData = {
+            budget: 60,
+            year: 2026,
+            days: new Array(12).fill(0)
+        };
+
+        function advGetBudget()  { return parseInt(document.getElementById('advBudget').value) || 0; }
+        function advGetYear()    { return parseInt(document.getElementById('advYear').value) || new Date().getFullYear(); }
+        function advGetUsed()    { return advData.days.reduce((a, b) => a + b, 0); }
+        function advGetRem()     { return advGetBudget() - advGetUsed(); }
+
+        function advReset() {
+            advData.days = new Array(12).fill(0);
+            advUpdateAll();
+        }
+
+        function advChangeDay(monthIdx, delta) {
+            const newVal = advData.days[monthIdx] + delta;
+            if (newVal < 0) return;
+            advData.days[monthIdx] = newVal;
+            advUpdateAll();
+        }
+
+        function advUpdateAll() {
+            const budget = advGetBudget();
+            const used   = advGetUsed();
+            const rem    = budget - used;
+            const pct    = budget > 0 ? used / budget : 0;
+
+            // Chips
+            document.getElementById('advChipTotal').textContent = budget;
+            document.getElementById('advChipUsed').textContent  = used;
+            document.getElementById('advChipRem').textContent   = rem;
+
+            const remCard = document.getElementById('advChipRemCard');
+            remCard.classList.remove('warning','danger');
+            if (rem < 0)           remCard.classList.add('danger');
+            else if (pct >= 0.9)   remCard.classList.add('warning');
+
+            // Warnungen
+            const warnDiv   = document.getElementById('advWarn');
+            const dangerDiv = document.getElementById('advDanger');
+            if (rem < 0) {
+                dangerDiv.classList.add('show');
+                document.getElementById('advOver').textContent = Math.abs(rem);
+                warnDiv.classList.remove('show');
+            } else if (pct >= 0.9 && pct < 1) {
+                warnDiv.classList.add('show');
+                dangerDiv.classList.remove('show');
+            } else {
+                warnDiv.classList.remove('show');
+                dangerDiv.classList.remove('show');
+            }
+
+            // Monats-Cards aktualisieren
+            for (let i = 0; i < 12; i++) {
+                const valEl = document.getElementById(`adv-val-${i}`);
+                const subEl = document.getElementById(`adv-sub-${i}`);
+                if (!valEl) continue;
+                valEl.textContent = advData.days[i];
+                valEl.classList.toggle('over', advData.days[i] > 0 && rem < 0);
+                // Arbeitstage im Monat berechnen für Hilfstext
+                const wt = advWorkdaysInMonth(advGetYear(), i);
+                subEl.textContent = `${wt} Arbeitstage`;
+            }
+
+            // Chart neu zeichnen
+            advDrawChart();
+        }
+
+        function advWorkdaysInMonth(year, monthIdx) {
+            let count = 0;
+            const daysInMonth = new Date(year, monthIdx + 1, 0).getDate();
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dow = new Date(year, monthIdx, d).getDay();
+                if (dow !== 0 && dow !== 6) count++;
+            }
+            return count;
+        }
+
+        function advBuildMonthCards() {
+            const container = document.getElementById('advMonthControls');
+            container.innerHTML = '';
+            for (let i = 0; i < 12; i++) {
+                const card = document.createElement('div');
+                card.className = 'month-card';
+                card.innerHTML = `
+                    <div class="month-name">${MONTHS_FULL[i]}</div>
+                    <div class="month-stepper">
+                        <button class="btn-step" onclick="advChangeDay(${i}, -1)">−</button>
+                        <div class="month-value" id="adv-val-${i}">0</div>
+                        <button class="btn-step" onclick="advChangeDay(${i}, 1)">+</button>
+                    </div>
+                    <div class="month-sub" id="adv-sub-${i}">– Arbeitstage</div>
+                `;
+                container.appendChild(card);
+            }
+        }
+
+        /* ---------- Canvas Chart ---------- */
+        function advDrawChart() {
+            const canvas = document.getElementById('advChart');
+            if (!canvas) return;
+            const dpr    = window.devicePixelRatio || 1;
+            const W      = canvas.parentElement.clientWidth - 40; // padding
+            if (W <= 0) return; // Tab noch nicht sichtbar
+            const H      = 320;
+            canvas.width  = W * dpr;
+            canvas.height = H * dpr;
+            canvas.style.width  = W + 'px';
+            canvas.style.height = H + 'px';
+
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+
+            const isDark   = document.body.classList.contains('dark');
+            const colorBg  = isDark ? '#2a2a3d' : '#ffffff';
+            const colorGrid = isDark ? '#3a3a50' : '#e8e8e8';
+            const colorAxis = isDark ? '#707088' : '#999999';
+            const colorText = isDark ? '#b0b0c0' : '#555555';
+            const accentCol = isDark ? '#7b8ff0' : '#667eea';
+            const fillTop   = isDark ? 'rgba(123,143,240,0.35)' : 'rgba(102,126,234,0.25)';
+            const fillBot   = isDark ? 'rgba(123,143,240,0)' : 'rgba(102,126,234,0)';
+            const budgetCol = isDark ? '#ffb74d' : '#f57c00';
+
+            const PAD_L = 52, PAD_R = 20, PAD_T = 24, PAD_B = 48;
+            const chartW = W - PAD_L - PAD_R;
+            const chartH = H - PAD_T - PAD_B;
+
+            const budget = advGetBudget();
+            const maxY   = Math.max(...advData.days, Math.ceil(budget / 12) + 3, 5);
+            const yStep  = advNiceStep(maxY);
+            const yMax   = Math.ceil(maxY / yStep) * yStep;
+
+            // Hintergrund
+            ctx.fillStyle = colorBg;
+            ctx.fillRect(0, 0, W, H);
+
+            // Hilfsfunktionen für Koordinaten
+            const xPos = (i) => PAD_L + (i / 11) * chartW;
+            const yPos = (v) => PAD_T + chartH - (v / yMax) * chartH;
+
+            // Grid-Linien & Y-Achse
+            ctx.strokeStyle = colorGrid;
+            ctx.lineWidth   = 1;
+            const gridSteps = Math.ceil(yMax / yStep);
+            for (let g = 0; g <= gridSteps; g++) {
+                const yv = g * yStep;
+                const y  = yPos(yv);
+                ctx.beginPath();
+                ctx.moveTo(PAD_L, y);
+                ctx.lineTo(PAD_L + chartW, y);
+                ctx.stroke();
+                ctx.fillStyle = colorText;
+                ctx.font = `11px system-ui`;
+                ctx.textAlign = 'right';
+                ctx.fillText(yv, PAD_L - 8, y + 4);
+            }
+
+            // Budget-Durchschnittslinie (gestrichelt)
+            const avgBudget = budget / 12;
+            const yBudget   = yPos(avgBudget);
+            ctx.save();
+            ctx.strokeStyle = budgetCol;
+            ctx.lineWidth   = 1.5;
+            ctx.setLineDash([6, 4]);
+            ctx.beginPath();
+            ctx.moveTo(PAD_L, yBudget);
+            ctx.lineTo(PAD_L + chartW, yBudget);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.restore();
+            // Label
+            ctx.fillStyle = budgetCol;
+            ctx.font = 'bold 10px system-ui';
+            ctx.textAlign = 'left';
+            ctx.fillText(`Ø ${avgBudget.toFixed(1)}/Monat`, PAD_L + 4, yBudget - 4);
+
+            // Achsen
+            ctx.strokeStyle = colorAxis;
+            ctx.lineWidth   = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(PAD_L, PAD_T);
+            ctx.lineTo(PAD_L, PAD_T + chartH);
+            ctx.lineTo(PAD_L + chartW, PAD_T + chartH);
+            ctx.stroke();
+
+            // X-Labels
+            ctx.fillStyle  = colorText;
+            ctx.font       = '11px system-ui';
+            ctx.textAlign  = 'center';
+            for (let i = 0; i < 12; i++) {
+                ctx.fillText(MONTHS_DE[i], xPos(i), PAD_T + chartH + 18);
+            }
+
+            // Achsentitel
+            ctx.save();
+            ctx.translate(13, PAD_T + chartH / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.fillStyle  = colorText;
+            ctx.font       = 'bold 11px system-ui';
+            ctx.textAlign  = 'center';
+            ctx.fillText('HO-Tage', 0, 0);
+            ctx.restore();
+
+            // Fläche unter der Kurve füllen
+            const grad = ctx.createLinearGradient(0, PAD_T, 0, PAD_T + chartH);
+            grad.addColorStop(0, fillTop);
+            grad.addColorStop(1, fillBot);
+
+            ctx.beginPath();
+            advSplinePath(ctx, advData.days, xPos, yPos);
+            ctx.lineTo(xPos(11), yPos(0));
+            ctx.lineTo(xPos(0),  yPos(0));
+            ctx.closePath();
+            ctx.fillStyle = grad;
+            ctx.fill();
+
+            // Spline-Linie
+            ctx.beginPath();
+            advSplinePath(ctx, advData.days, xPos, yPos);
+            ctx.strokeStyle = accentCol;
+            ctx.lineWidth   = 2.5;
+            ctx.stroke();
+
+            // Punkte
+            for (let i = 0; i < 12; i++) {
+                const x = xPos(i);
+                const y = yPos(advData.days[i]);
+                // Äußerer Ring
+                ctx.beginPath();
+                ctx.arc(x, y, 7, 0, Math.PI * 2);
+                ctx.fillStyle = colorBg;
+                ctx.fill();
+                ctx.strokeStyle = accentCol;
+                ctx.lineWidth   = 2.5;
+                ctx.stroke();
+                // Innerer Punkt
+                ctx.beginPath();
+                ctx.arc(x, y, 3.5, 0, Math.PI * 2);
+                ctx.fillStyle = accentCol;
+                ctx.fill();
+                // Wert über Punkt (nur wenn > 0)
+                if (advData.days[i] > 0) {
+                    ctx.fillStyle  = colorText;
+                    ctx.font       = 'bold 11px system-ui';
+                    ctx.textAlign  = 'center';
+                    ctx.fillText(advData.days[i], x, y - 13);
+                }
+            }
+        }
+
+        /* Catmull-Rom Spline Pfad */
+        function advSplinePath(ctx, data, xPos, yPos) {
+            const pts = data.map((v, i) => [xPos(i), yPos(v)]);
+            ctx.moveTo(pts[0][0], pts[0][1]);
+            for (let i = 0; i < pts.length - 1; i++) {
+                const p0 = pts[Math.max(i - 1, 0)];
+                const p1 = pts[i];
+                const p2 = pts[i + 1];
+                const p3 = pts[Math.min(i + 2, pts.length - 1)];
+                const cp1x = p1[0] + (p2[0] - p0[0]) / 6;
+                const cp1y = p1[1] + (p2[1] - p0[1]) / 6;
+                const cp2x = p2[0] - (p3[0] - p1[0]) / 6;
+                const cp2y = p2[1] - (p3[1] - p1[1]) / 6;
+                ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2[0], p2[1]);
+            }
+        }
+
+        function advNiceStep(maxVal) {
+            if (maxVal <= 5)  return 1;
+            if (maxVal <= 10) return 2;
+            if (maxVal <= 20) return 5;
+            if (maxVal <= 50) return 10;
+            return 20;
+        }
+
+        /* Event-Listener */
+        document.getElementById('advBudget').addEventListener('input', advUpdateAll);
+        document.getElementById('advYear').addEventListener('input', advUpdateAll);
+        window.addEventListener('resize', () => { if (document.getElementById('tab-advanced').classList.contains('active')) advDrawChart(); });
+
+        /* ---------- Drag-Interaktion auf dem Canvas ---------- */
+        (function initDrag() {
+            const canvas = document.getElementById('advChart');
+            let dragging  = null;   // { monthIdx, startY, startVal }
+            let lastYMax  = 1;
+
+            const PAD_L = 52, PAD_R = 20, PAD_T = 24, PAD_B = 48;
+            const HIT_R = 14; // Klick-Radius in CSS-px um einen Punkt
+
+            function getCanvasPos(e) {
+                const rect = canvas.getBoundingClientRect();
+                const src  = e.touches ? e.touches[0] : e;
+                return {
+                    x: src.clientX - rect.left,
+                    y: src.clientY - rect.top
+                };
+            }
+
+            function getChartDims() {
+                const W = canvas.clientWidth;
+                const H = canvas.clientHeight;
+                return {
+                    W, H,
+                    chartW: W - PAD_L - PAD_R,
+                    chartH: H - PAD_T - PAD_B
+                };
+            }
+
+            function pointForMonth(i, dims) {
+                const budget = advGetBudget();
+                const maxY   = Math.max(...advData.days, Math.ceil(budget / 12) + 3, 5);
+                const yStep  = advNiceStep(maxY);
+                const yMax   = Math.ceil(maxY / yStep) * yStep;
+                lastYMax = yMax;
+                const x = PAD_L + (i / 11) * dims.chartW;
+                const y = PAD_T + dims.chartH - (advData.days[i] / yMax) * dims.chartH;
+                return { x, y, yMax };
+            }
+
+            function findHitPoint(pos) {
+                const dims = getChartDims();
+                for (let i = 0; i < 12; i++) {
+                    const pt = pointForMonth(i, dims);
+                    const dx = pos.x - pt.x;
+                    const dy = pos.y - pt.y;
+                    if (Math.sqrt(dx * dx + dy * dy) <= HIT_R) return i;
+                }
+                return -1;
+            }
+
+            function valueFromY(y, yMax) {
+                const dims = getChartDims();
+                const chartH = dims.chartH;
+                const val = (PAD_T + chartH - y) / chartH * yMax;
+                return Math.max(0, Math.round(val));
+            }
+
+            // Mouse
+            canvas.addEventListener('mousedown', (e) => {
+                const pos = getCanvasPos(e);
+                const idx = findHitPoint(pos);
+                if (idx === -1) return;
+                e.preventDefault();
+                canvas.classList.add('dragging');
+                const dims  = getChartDims();
+                const { yMax } = pointForMonth(idx, dims);
+                dragging = { idx, yMax };
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                if (!dragging) {
+                    // Cursor ändern wenn über Punkt
+                    const pos = getCanvasPos(e);
+                    const idx = findHitPoint(pos);
+                    canvas.style.cursor = idx !== -1 ? 'grab' : 'default';
+                    return;
+                }
+                e.preventDefault();
+                const pos = getCanvasPos(e);
+                const newVal = valueFromY(pos.y, dragging.yMax);
+                if (advData.days[dragging.idx] !== newVal) {
+                    advData.days[dragging.idx] = newVal;
+                    advUpdateAll();
+                }
+            });
+
+            window.addEventListener('mouseup', () => {
+                if (!dragging) return;
+                dragging = null;
+                canvas.classList.remove('dragging');
+                canvas.style.cursor = 'grab';
+            });
+
+            // Touch
+            canvas.addEventListener('touchstart', (e) => {
+                const pos = getCanvasPos(e);
+                const idx = findHitPoint(pos);
+                if (idx === -1) return;
+                e.preventDefault();
+                const dims = getChartDims();
+                const { yMax } = pointForMonth(idx, dims);
+                dragging = { idx, yMax };
+            }, { passive: false });
+
+            canvas.addEventListener('touchmove', (e) => {
+                if (!dragging) return;
+                e.preventDefault();
+                const pos = getCanvasPos(e);
+                const newVal = valueFromY(pos.y, dragging.yMax);
+                if (advData.days[dragging.idx] !== newVal) {
+                    advData.days[dragging.idx] = newVal;
+                    advUpdateAll();
+                }
+            }, { passive: false });
+
+            canvas.addEventListener('touchend', () => { dragging = null; });
+        })();
+
+        /* Init – erst nach Layout rendern */
+        advBuildMonthCards();
+        advUpdateAll(); // Chips + Karten befüllen, aber Chart erst wenn sichtbar
+
     </script>
 </body>
 </html>
