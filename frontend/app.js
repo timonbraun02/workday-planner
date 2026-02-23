@@ -701,33 +701,53 @@ const MONTHS_FULL = ['Januar','Februar','März','April','Mai','Juni','Juli','Aug
 let advData = (() => {
     try {
         const saved = JSON.parse(localStorage.getItem('wp_adv'));
-        if (saved && Array.isArray(saved.days) && saved.days.length === 12) {
+        if (saved && Array.isArray(saved.hoDays) && saved.hoDays.length === 12) {
             // Gespeicherte Werte in die Inputs übertragen
             if (saved.budget != null) document.getElementById('advBudget').value = saved.budget;
             if (saved.year   != null) document.getElementById('advYear').value   = saved.year;
-            return { budget: saved.budget, year: saved.year, days: saved.days };
+            return { 
+                budget: saved.budget, 
+                year: saved.year, 
+                hoDays: saved.hoDays,
+                vacDays: saved.vacDays || new Array(12).fill(0)
+            };
+        }
+        // Legacy support: migrate old 'days' to 'hoDays'
+        if (saved && Array.isArray(saved.days) && saved.days.length === 12) {
+            if (saved.budget != null) document.getElementById('advBudget').value = saved.budget;
+            if (saved.year   != null) document.getElementById('advYear').value   = saved.year;
+            return { 
+                budget: saved.budget, 
+                year: saved.year, 
+                hoDays: saved.days,
+                vacDays: new Array(12).fill(0)
+            };
         }
     } catch(e) {}
-    return { budget: 60, year: new Date().getFullYear(), days: new Array(12).fill(0) };
+    return { budget: 60, year: new Date().getFullYear(), hoDays: new Array(12).fill(0), vacDays: new Array(12).fill(0) };
 })();
 
 function saveAdvState() {
     localStorage.setItem('wp_adv', JSON.stringify({
         budget: advGetBudget(),
         year:   advGetYear(),
-        days:   advData.days
+        hoDays: advData.hoDays,
+        vacDays: advData.vacDays
     }));
 }
 
 function advGetBudget()  { return parseInt(document.getElementById('advBudget').value) || 0; }
 function advGetYear()    { return parseInt(document.getElementById('advYear').value) || new Date().getFullYear(); }
-function advGetUsed()    { return advData.days.reduce((a, b) => a + b, 0); }
+function advGetUsedHO()  { return advData.hoDays.reduce((a, b) => a + b, 0); }
+function advGetUsedVac() { return advData.vacDays.reduce((a, b) => a + b, 0); }
+function advGetUsed()    { return advGetUsedHO() + advGetUsedVac(); }
 function advGetRem()     { return advGetBudget() - advGetUsed(); }
 
 function advReset() {
     document.getElementById('advBudget').value = 130;
     document.getElementById('advYear').value   = new Date().getFullYear();
-    advData.days = new Array(12).fill(0);
+    advData.hoDays = new Array(12).fill(0);
+    advData.vacDays = new Array(12).fill(0);
     localStorage.removeItem('wp_adv');
     advUpdateAll();
 }
@@ -762,10 +782,22 @@ function zeitrechnerReset() {
     document.getElementById('overtimeCard').style.display = 'none';
 }
 
-function advChangeDay(monthIdx, delta) {
-    const newVal = advData.days[monthIdx] + delta;
-    if (newVal < 0) return;
-    advData.days[monthIdx] = newVal;
+function advChangeDay(monthIdx, type, delta) {
+    const workdays = advWorkdaysInMonth(advGetYear(), monthIdx);
+    const currentHO = advData.hoDays[monthIdx];
+    const currentVac = advData.vacDays[monthIdx];
+    
+    if (type === 'ho') {
+        const newVal = currentHO + delta;
+        if (newVal < 0) return;
+        if (newVal + currentVac > workdays) return; // Limit erreicht
+        advData.hoDays[monthIdx] = newVal;
+    } else if (type === 'vac') {
+        const newVal = currentVac + delta;
+        if (newVal < 0) return;
+        if (currentHO + newVal > workdays) return; // Limit erreicht
+        advData.vacDays[monthIdx] = newVal;
+    }
     advUpdateAll();
 }
 
@@ -802,14 +834,18 @@ function advUpdateAll() {
 
     // Monats-Cards aktualisieren
     for (let i = 0; i < 12; i++) {
-        const valEl = document.getElementById(`adv-val-${i}`);
+        const hoEl = document.getElementById(`adv-ho-${i}`);
+        const vacEl = document.getElementById(`adv-vac-${i}`);
         const subEl = document.getElementById(`adv-sub-${i}`);
-        if (!valEl) continue;
-        valEl.textContent = advData.days[i];
-        valEl.classList.toggle('over', advData.days[i] > 0 && rem < 0);
+        if (!hoEl || !vacEl) continue;
+        hoEl.textContent = advData.hoDays[i];
+        vacEl.textContent = advData.vacDays[i];
+        const total = advData.hoDays[i] + advData.vacDays[i];
+        const workdays = advWorkdaysInMonth(advGetYear(), i);
+        hoEl.classList.toggle('over', total > workdays || (total > 0 && rem < 0));
+        vacEl.classList.toggle('over', total > workdays || (total > 0 && rem < 0));
         // Arbeitstage im Monat berechnen für Hilfstext
-        const wt = advWorkdaysInMonth(advGetYear(), i);
-        subEl.textContent = `${wt} Arbeitstage`;
+        subEl.textContent = `${total}/${workdays} Tage`;
     }
 
     // Chart neu zeichnen
@@ -835,12 +871,19 @@ function advBuildMonthCards() {
         card.className = 'month-card';
         card.innerHTML = `
             <div class="month-name">${MONTHS_FULL[i]}</div>
+            <div class="month-type-label">HO-Tage</div>
             <div class="month-stepper">
-                <button class="btn-step" onclick="advChangeDay(${i}, -1)">−</button>
-                <div class="month-value" id="adv-val-${i}">0</div>
-                <button class="btn-step" onclick="advChangeDay(${i}, 1)">+</button>
+                <button class="btn-step" onclick="advChangeDay(${i}, 'ho', -1)">−</button>
+                <div class="month-value" id="adv-ho-${i}">0</div>
+                <button class="btn-step" onclick="advChangeDay(${i}, 'ho', 1)">+</button>
             </div>
-            <div class="month-sub" id="adv-sub-${i}">– Arbeitstage</div>
+            <div class="month-type-label">Urlaub</div>
+            <div class="month-stepper">
+                <button class="btn-step" onclick="advChangeDay(${i}, 'vac', -1)">−</button>
+                <div class="month-value" id="adv-vac-${i}">0</div>
+                <button class="btn-step" onclick="advChangeDay(${i}, 'vac', 1)">+</button>
+            </div>
+            <div class="month-sub" id="adv-sub-${i}">0/– Tage</div>
         `;
         container.appendChild(card);
     }
@@ -877,7 +920,8 @@ function advDrawChart() {
     const chartH = H - PAD_T - PAD_B;
 
     const budget = advGetBudget();
-    const maxY   = Math.max(...advData.days, Math.ceil(budget / 12) + 3, 5);
+    const maxVals = advData.hoDays.map((ho, i) => ho + advData.vacDays[i]);
+    const maxY   = Math.max(...maxVals, Math.ceil(budget / 12) + 3, 5);
     const yStep  = advNiceStep(maxY);
     const yMax   = Math.ceil(maxY / yStep) * yStep;
 
@@ -952,51 +996,149 @@ function advDrawChart() {
     ctx.fillText('HO-Tage', 0, 0);
     ctx.restore();
 
-    // Fläche unter der Kurve füllen
-    const grad = ctx.createLinearGradient(0, PAD_T, 0, PAD_T + chartH);
-    grad.addColorStop(0, fillTop);
-    grad.addColorStop(1, fillBot);
+    // Farben für HO und Urlaub
+    const vacColor = isDark ? '#f4a261' : '#e76f51';
+    const vacFillTop = isDark ? 'rgba(244,162,97,0.2)' : 'rgba(231,111,81,0.15)';
+    const vacFillBot = isDark ? 'rgba(244,162,97,0)' : 'rgba(231,111,81,0)';
+    const hoFillTop = isDark ? 'rgba(123,143,240,0.2)' : 'rgba(102,126,234,0.15)';
+    const hoFillBot = isDark ? 'rgba(123,143,240,0)' : 'rgba(102,126,234,0)';
+
+    // 1. Urlaubstage - Fläche
+    const vacGrad = ctx.createLinearGradient(0, PAD_T, 0, PAD_T + chartH);
+    vacGrad.addColorStop(0, vacFillTop);
+    vacGrad.addColorStop(1, vacFillBot);
 
     ctx.beginPath();
-    advSplinePath(ctx, advData.days, xPos, yPos);
+    advSplinePath(ctx, advData.vacDays, xPos, yPos);
     ctx.lineTo(xPos(11), yPos(0));
     ctx.lineTo(xPos(0),  yPos(0));
     ctx.closePath();
-    ctx.fillStyle = grad;
+    ctx.fillStyle = vacGrad;
     ctx.fill();
 
-    // Spline-Linie
+    // 2. HO-Tage - Fläche
+    const hoGrad = ctx.createLinearGradient(0, PAD_T, 0, PAD_T + chartH);
+    hoGrad.addColorStop(0, hoFillTop);
+    hoGrad.addColorStop(1, hoFillBot);
+
     ctx.beginPath();
-    advSplinePath(ctx, advData.days, xPos, yPos);
+    advSplinePath(ctx, advData.hoDays, xPos, yPos);
+    ctx.lineTo(xPos(11), yPos(0));
+    ctx.lineTo(xPos(0),  yPos(0));
+    ctx.closePath();
+    ctx.fillStyle = hoGrad;
+    ctx.fill();
+
+    // 3. Urlaubstage - Linie
+    ctx.beginPath();
+    advSplinePath(ctx, advData.vacDays, xPos, yPos);
+    ctx.strokeStyle = vacColor;
+    ctx.lineWidth   = 2.5;
+    ctx.stroke();
+
+    // 4. HO-Tage - Linie
+    ctx.beginPath();
+    advSplinePath(ctx, advData.hoDays, xPos, yPos);
     ctx.strokeStyle = accentCol;
     ctx.lineWidth   = 2.5;
     ctx.stroke();
 
-    // Punkte
+    // 5. Punkte für beide Werte
+    const totalDays = advData.hoDays.map((ho, i) => ho + advData.vacDays[i]);
     for (let i = 0; i < 12; i++) {
         const x = xPos(i);
-        const y = yPos(advData.days[i]);
-        // Äußerer Ring
-        ctx.beginPath();
-        ctx.arc(x, y, 7, 0, Math.PI * 2);
-        ctx.fillStyle = colorBg;
-        ctx.fill();
-        ctx.strokeStyle = accentCol;
-        ctx.lineWidth   = 2.5;
-        ctx.stroke();
-        // Innerer Punkt
-        ctx.beginPath();
-        ctx.arc(x, y, 3.5, 0, Math.PI * 2);
-        ctx.fillStyle = accentCol;
-        ctx.fill();
-        // Wert über Punkt (nur wenn > 0)
-        if (advData.days[i] > 0) {
-            ctx.fillStyle  = colorText;
-            ctx.font       = 'bold 11px system-ui';
-            ctx.textAlign  = 'center';
-            ctx.fillText(advData.days[i], x, y - 13);
+        const workdays = advWorkdaysInMonth(advGetYear(), i);
+        const isOverLimit = totalDays[i] > workdays;
+        
+        // Urlaubspunkt
+        if (advData.vacDays[i] > 0) {
+            const yVac = yPos(advData.vacDays[i]);
+            ctx.beginPath();
+            ctx.arc(x, yVac, 6, 0, Math.PI * 2);
+            ctx.fillStyle = colorBg;
+            ctx.fill();
+            ctx.strokeStyle = isOverLimit ? '#ff4444' : vacColor;
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(x, yVac, 3, 0, Math.PI * 2);
+            ctx.fillStyle = isOverLimit ? '#ff4444' : vacColor;
+            ctx.fill();
+            
+            // Wert neben Punkt (rechts)
+            ctx.fillStyle = isOverLimit ? '#ff4444' : vacColor;
+            ctx.font = 'bold 10px system-ui';
+            ctx.textAlign = 'left';
+            ctx.fillText(advData.vacDays[i], x + 10, yVac + 3);
+        }
+        
+        // HO-Punkt
+        if (advData.hoDays[i] > 0) {
+            const yHO = yPos(advData.hoDays[i]);
+            ctx.beginPath();
+            ctx.arc(x, yHO, 6, 0, Math.PI * 2);
+            ctx.fillStyle = colorBg;
+            ctx.fill();
+            ctx.strokeStyle = isOverLimit ? '#ff4444' : accentCol;
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(x, yHO, 3, 0, Math.PI * 2);
+            ctx.fillStyle = isOverLimit ? '#ff4444' : accentCol;
+            ctx.fill();
+            
+            // Wert neben Punkt (links)
+            ctx.fillStyle = isOverLimit ? '#ff4444' : accentCol;
+            ctx.font = 'bold 10px system-ui';
+            ctx.textAlign = 'right';
+            ctx.fillText(advData.hoDays[i], x - 10, yHO + 3);
+        }
+        
+        // Warnung wenn Limit überschritten
+        if (isOverLimit && totalDays[i] > 0) {
+            const yMax = Math.min(yPos(advData.hoDays[i]), yPos(advData.vacDays[i]));
+            ctx.fillStyle = '#ff4444';
+            ctx.font = 'bold 14px system-ui';
+            ctx.textAlign = 'center';
+            ctx.fillText('⚠', x, yMax - 12);
         }
     }
+    
+    // Legende
+    const legX = PAD_L + chartW - 140;
+    const legY = PAD_T + 10;
+    
+    // HO-Tage Legende
+    ctx.beginPath();
+    ctx.moveTo(legX, legY);
+    ctx.lineTo(legX + 25, legY);
+    ctx.strokeStyle = accentCol;
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(legX + 12.5, legY, 4, 0, Math.PI * 2);
+    ctx.fillStyle = accentCol;
+    ctx.fill();
+    ctx.fillStyle = colorText;
+    ctx.font = '11px system-ui';
+    ctx.textAlign = 'left';
+    ctx.fillText('HO-Tage', legX + 30, legY + 4);
+    
+    // Urlaub Legende
+    ctx.beginPath();
+    ctx.moveTo(legX, legY + 18);
+    ctx.lineTo(legX + 25, legY + 18);
+    ctx.strokeStyle = vacColor;
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(legX + 12.5, legY + 18, 4, 0, Math.PI * 2);
+    ctx.fillStyle = vacColor;
+    ctx.fill();
+    ctx.fillStyle = colorText;
+    ctx.font = '11px system-ui';
+    ctx.textAlign = 'left';
+    ctx.fillText('Urlaub', legX + 30, legY + 22);
 }
 
 /* Catmull-Rom Spline Pfad */
@@ -1060,13 +1202,15 @@ window.addEventListener('resize', () => { if (document.getElementById('tab-advan
 
     function pointForMonth(i, dims) {
         const budget = advGetBudget();
-        const maxY   = Math.max(...advData.days, Math.ceil(budget / 12) + 3, 5);
+        const totalDays = advData.hoDays.map((ho, idx) => ho + advData.vacDays[idx]);
+        const maxY   = Math.max(...totalDays, Math.ceil(budget / 12) + 3, 5);
         const yStep  = advNiceStep(maxY);
         const yMax   = Math.ceil(maxY / yStep) * yStep;
         lastYMax = yMax;
         const x = PAD_L + (i / 11) * dims.chartW;
-        const y = PAD_T + dims.chartH - (advData.days[i] / yMax) * dims.chartH;
-        return { x, y, yMax };
+        const yHO = PAD_T + dims.chartH - (advData.hoDays[i] / yMax) * dims.chartH;
+        const yVac = PAD_T + dims.chartH - (advData.vacDays[i] / yMax) * dims.chartH;
+        return { x, yHO, yVac, yMax };
     }
 
     function findHitPoint(pos) {
@@ -1090,13 +1234,30 @@ window.addEventListener('resize', () => { if (document.getElementById('tab-advan
     // Mouse
     canvas.addEventListener('mousedown', (e) => {
         const pos = getCanvasPos(e);
-        const idx = findHitPoint(pos);
-        if (idx === -1) return;
-        e.preventDefault();
-        canvas.classList.add('dragging');
-        const dims  = getChartDims();
-        const { yMax } = pointForMonth(idx, dims);
-        dragging = { idx, yMax };
+        const dims = getChartDims();
+        
+        // Check welcher Punkt getroffen wurde (HO oder Urlaub)
+        for (let i = 0; i < 12; i++) {
+            const pt = pointForMonth(i, dims);
+            const dxHO = pos.x - pt.x;
+            const dyHO = pos.y - pt.yHO;
+            const dxVac = pos.x - pt.x;
+            const dyVac = pos.y - pt.yVac;
+            
+            // HO-Punkt hat Vorrang wenn beide nah sind
+            if (Math.sqrt(dxHO * dxHO + dyHO * dyHO) <= HIT_R) {
+                e.preventDefault();
+                canvas.classList.add('dragging');
+                dragging = { idx: i, yMax: pt.yMax, type: 'ho' };
+                return;
+            }
+            if (Math.sqrt(dxVac * dxVac + dyVac * dyVac) <= HIT_R) {
+                e.preventDefault();
+                canvas.classList.add('dragging');
+                dragging = { idx: i, yMax: pt.yMax, type: 'vac' };
+                return;
+            }
+        }
     });
 
     window.addEventListener('mousemove', (e) => {
@@ -1110,9 +1271,26 @@ window.addEventListener('resize', () => { if (document.getElementById('tab-advan
         e.preventDefault();
         const pos = getCanvasPos(e);
         const newVal = valueFromY(pos.y, dragging.yMax);
-        if (advData.days[dragging.idx] !== newVal) {
-            advData.days[dragging.idx] = newVal;
-            advUpdateAll();
+        const workdays = advWorkdaysInMonth(advGetYear(), dragging.idx);
+        
+        if (dragging.type === 'ho') {
+            // HO-Tage ändern
+            const currentVac = advData.vacDays[dragging.idx];
+            const maxHO = workdays - currentVac;
+            const clampedVal = Math.max(0, Math.min(newVal, maxHO));
+            if (advData.hoDays[dragging.idx] !== clampedVal) {
+                advData.hoDays[dragging.idx] = clampedVal;
+                advUpdateAll();
+            }
+        } else if (dragging.type === 'vac') {
+            // Urlaubstage ändern
+            const currentHO = advData.hoDays[dragging.idx];
+            const maxVac = workdays - currentHO;
+            const clampedVal = Math.max(0, Math.min(newVal, maxVac));
+            if (advData.vacDays[dragging.idx] !== clampedVal) {
+                advData.vacDays[dragging.idx] = clampedVal;
+                advUpdateAll();
+            }
         }
     });
 
@@ -1126,12 +1304,26 @@ window.addEventListener('resize', () => { if (document.getElementById('tab-advan
     // Touch
     canvas.addEventListener('touchstart', (e) => {
         const pos = getCanvasPos(e);
-        const idx = findHitPoint(pos);
-        if (idx === -1) return;
-        e.preventDefault();
         const dims = getChartDims();
-        const { yMax } = pointForMonth(idx, dims);
-        dragging = { idx, yMax };
+        
+        for (let i = 0; i < 12; i++) {
+            const pt = pointForMonth(i, dims);
+            const dxHO = pos.x - pt.x;
+            const dyHO = pos.y - pt.yHO;
+            const dxVac = pos.x - pt.x;
+            const dyVac = pos.y - pt.yVac;
+            
+            if (Math.sqrt(dxHO * dxHO + dyHO * dyHO) <= HIT_R) {
+                e.preventDefault();
+                dragging = { idx: i, yMax: pt.yMax, type: 'ho' };
+                return;
+            }
+            if (Math.sqrt(dxVac * dxVac + dyVac * dyVac) <= HIT_R) {
+                e.preventDefault();
+                dragging = { idx: i, yMax: pt.yMax, type: 'vac' };
+                return;
+            }
+        }
     }, { passive: false });
 
     canvas.addEventListener('touchmove', (e) => {
@@ -1139,9 +1331,24 @@ window.addEventListener('resize', () => { if (document.getElementById('tab-advan
         e.preventDefault();
         const pos = getCanvasPos(e);
         const newVal = valueFromY(pos.y, dragging.yMax);
-        if (advData.days[dragging.idx] !== newVal) {
-            advData.days[dragging.idx] = newVal;
-            advUpdateAll();
+        const workdays = advWorkdaysInMonth(advGetYear(), dragging.idx);
+        
+        if (dragging.type === 'ho') {
+            const currentVac = advData.vacDays[dragging.idx];
+            const maxHO = workdays - currentVac;
+            const clampedVal = Math.max(0, Math.min(newVal, maxHO));
+            if (advData.hoDays[dragging.idx] !== clampedVal) {
+                advData.hoDays[dragging.idx] = clampedVal;
+                advUpdateAll();
+            }
+        } else if (dragging.type === 'vac') {
+            const currentHO = advData.hoDays[dragging.idx];
+            const maxVac = workdays - currentHO;
+            const clampedVal = Math.max(0, Math.min(newVal, maxVac));
+            if (advData.vacDays[dragging.idx] !== clampedVal) {
+                advData.vacDays[dragging.idx] = clampedVal;
+                advUpdateAll();
+            }
         }
     }, { passive: false });
 
