@@ -1235,6 +1235,7 @@
             `;
             document.getElementById('periodList').appendChild(item);
             refreshPeriodNumbers();
+            if (typeof savePlanerState === 'function') savePlanerState();
         }
 
         /* Berechnet sinnvolle Quick-Buttons abhängig von der Position des Zeitraums */
@@ -1304,6 +1305,7 @@
             const el = document.getElementById(`period-${id}`);
             if (el) el.remove();
             refreshPeriodNumbers();
+            if (typeof savePlanerState === 'function') savePlanerState();
         }
 
         function refreshPeriodNumbers() {
@@ -1573,6 +1575,27 @@
             document.getElementById('timeResults').classList.add('show');
         });
 
+        // Arbeitszeitrechner: Persistenz
+        (function initZeitrechner() {
+            const saved = (() => { try { return JSON.parse(localStorage.getItem('wp_zeit')); } catch(e) { return null; } })();
+            if (!saved) return;
+            if (saved.start)   document.getElementById('workStart').value    = saved.start;
+            if (saved.end)     document.getElementById('workEnd').value      = saved.end;
+            if (saved.pause != null) document.getElementById('breakMinutes').value = saved.pause;
+            if (saved.target != null && saved.target !== '') document.getElementById('targetHours').value = saved.target;
+        })();
+
+        ['workStart','workEnd','breakMinutes','targetHours'].forEach(id => {
+            document.getElementById(id).addEventListener('input', () => {
+                localStorage.setItem('wp_zeit', JSON.stringify({
+                    start:  document.getElementById('workStart').value,
+                    end:    document.getElementById('workEnd').value,
+                    pause:  document.getElementById('breakMinutes').value,
+                    target: document.getElementById('targetHours').value
+                }));
+            });
+        });
+
         // (Quick-Actions sind jetzt direkt in den Zeitraum-Karten)
 
         document.getElementById('planForm').addEventListener('submit', (e) => {
@@ -1646,11 +1669,44 @@
 
         // Ersten Zeitraum erstellen und vorbelegen
         (function initPeriods() {
-            const now     = new Date();
-            const today   = now.toISOString().split('T')[0];
-            const yearEnd = `${now.getFullYear()}-12-31`;
-            addPeriod(today, yearEnd, 0, 0, 0);
+            const saved = (() => { try { return JSON.parse(localStorage.getItem('wp_planer')); } catch(e) { return null; } })();
+
+            // Bundesland und 4-Tage-Woche wiederherstellen
+            if (saved) {
+                if (saved.bundesland != null)
+                    document.getElementById('bundesland').value = saved.bundesland;
+                if (saved.fourDay != null)
+                    document.getElementById('fourDayWeek').checked = saved.fourDay;
+            }
+
+            // Zeiträume wiederherstellen (oder Default)
+            const periods = saved && saved.periods && saved.periods.length > 0
+                ? saved.periods
+                : [{ start: new Date().toISOString().split('T')[0], end: `${new Date().getFullYear()}-12-31`, ho: 0, vac: 0, sick: 0 }];
+
+            periods.forEach(p => addPeriod(p.start, p.end, p.ho, p.vac, p.sick));
         })();
+
+        function savePlanerState() {
+            const items = document.querySelectorAll('.period-item');
+            const periods = Array.from(items).map(item => ({
+                start: item.querySelector('.p-start').value,
+                end:   item.querySelector('.p-end').value,
+                ho:    parseInt(item.querySelector('.p-ho').value)   || 0,
+                vac:   parseInt(item.querySelector('.p-vac').value)  || 0,
+                sick:  parseInt(item.querySelector('.p-sick').value) || 0
+            }));
+            localStorage.setItem('wp_planer', JSON.stringify({
+                periods,
+                bundesland: document.getElementById('bundesland').value,
+                fourDay:    document.getElementById('fourDayWeek').checked
+            }));
+        }
+
+        // Planer-State bei jeder Änderung speichern
+        document.getElementById('periodList').addEventListener('input', savePlanerState);
+        document.getElementById('bundesland').addEventListener('change', savePlanerState);
+        document.getElementById('fourDayWeek').addEventListener('change', savePlanerState);
 
         /* =========================================================
            ADVANCED HO DAY PLANER
@@ -1658,11 +1714,26 @@
         const MONTHS_DE = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
         const MONTHS_FULL = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
 
-        let advData = {
-            budget: 60,
-            year: 2026,
-            days: new Array(12).fill(0)
-        };
+        let advData = (() => {
+            try {
+                const saved = JSON.parse(localStorage.getItem('wp_adv'));
+                if (saved && Array.isArray(saved.days) && saved.days.length === 12) {
+                    // Gespeicherte Werte in die Inputs übertragen
+                    if (saved.budget != null) document.getElementById('advBudget').value = saved.budget;
+                    if (saved.year   != null) document.getElementById('advYear').value   = saved.year;
+                    return { budget: saved.budget, year: saved.year, days: saved.days };
+                }
+            } catch(e) {}
+            return { budget: 60, year: new Date().getFullYear(), days: new Array(12).fill(0) };
+        })();
+
+        function saveAdvState() {
+            localStorage.setItem('wp_adv', JSON.stringify({
+                budget: advGetBudget(),
+                year:   advGetYear(),
+                days:   advData.days
+            }));
+        }
 
         function advGetBudget()  { return parseInt(document.getElementById('advBudget').value) || 0; }
         function advGetYear()    { return parseInt(document.getElementById('advYear').value) || new Date().getFullYear(); }
@@ -1726,6 +1797,7 @@
 
             // Chart neu zeichnen
             advDrawChart();
+            saveAdvState();
         }
 
         function advWorkdaysInMonth(year, monthIdx) {
