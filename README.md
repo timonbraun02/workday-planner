@@ -1,8 +1,6 @@
 # Workday Planner
 
-A simple, self-contained browser tool for workday planning and daily work time tracking. No server, no dependencies — just open the HTML file.
-
-**Live:** [https://&lt;dein-username&gt;.github.io/workday-planner](https://github.com)
+A self-contained, single-file browser tool for home office planning and daily work time tracking. No installation, no dependencies — just open and use.
 
 ## Features
 
@@ -17,6 +15,22 @@ A simple, self-contained browser tool for workday planning and daily work time t
 - Enter start time, end time, and break duration
 - "Jetzt" button sets end time to current time
 - Shows gross time, break, and net working hours
+- Warns about German Arbeitszeitgesetz (ArbZG) violations
+
+### Advanced HO Day Planer
+- Plan home office days visually across all 12 months
+- Interactive spline chart (Canvas) — drag data points up/down with mouse or touch
+- Configurable annual HO budget with live remaining-days counter
+- Dashed average budget line for orientation
+- Color-coded warnings:
+  - 🟡 Yellow warning at ≥ 90 % budget usage
+  - 🔴 Red alert when budget is exceeded (shows exact overage)
+- Month cards with +/− steppers and available workdays per month
+- Fully responsive and Dark Mode compatible
+
+### General
+- Dark / Light mode toggle (persisted via localStorage)
+- Fully client-side — works offline, no server required
 
 ## Usage
 
@@ -37,7 +51,7 @@ To enable GitHub Pages in a new repo:
 ```
 workday-planner/
 ├── frontend/
-│   └── index.html
+│   └── index.html      ← entire app (HTML + CSS + JS, single file)
 ├── .github/
 │   └── workflows/
 │       └── deploy.yml
