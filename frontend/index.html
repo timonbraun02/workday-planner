@@ -267,6 +267,28 @@
             transform: translateY(0);
         }
 
+        .btn-secondary {
+            padding: 16px 24px;
+            background: transparent;
+            color: var(--text-muted);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1.0rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s, color 0.2s;
+        }
+
+        .btn-secondary:hover {
+            border-color: #c62828;
+            color: #c62828;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary:active {
+            transform: translateY(0);
+        }
+
         .results {
             margin-top: 30px;
             padding: 25px;
@@ -814,7 +836,10 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn-primary">Berechnen</button>
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <button type="submit" class="btn-primary">Berechnen</button>
+                    <button type="button" class="btn-secondary" onclick="planerReset()">Zurücksetzen</button>
+                </div>
             </form>
 
             <div id="error" class="error"></div>
@@ -908,7 +933,7 @@
                         </div>
                         <div class="form-group">
                             <label for="breakMinutes">Pause (Minuten)</label>
-                            <input type="number" id="breakMinutes" min="0" value="30" required>
+                            <input type="number" id="breakMinutes" min="0" value="45" required>
                         </div>
                         <div class="form-group">
                             <label for="targetHours">Sollzeit (Stunden, optional)</label>
@@ -916,7 +941,10 @@
                         </div>
                     </div>
                 </div>
-                <button type="submit" class="btn-primary">Berechnen</button>
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <button type="submit" class="btn-primary">Berechnen</button>
+                    <button type="button" class="btn-secondary" onclick="zeitrechnerReset()">Zurücksetzen</button>
+                </div>
             </form>
 
             <div id="timeError" class="error"></div>
@@ -974,7 +1002,7 @@
                 </div>
                 <div class="form-group">
                     <label for="advBudget">Verfügbare HO-Tage (Jahresbudget)</label>
-                    <input type="number" id="advBudget" min="0" max="365" value="60">
+                    <input type="number" id="advBudget" min="0" max="365" value="130">
                 </div>
                 <div class="form-group" style="flex: 0;">
                     <label style="visibility:hidden">Reset</label>
@@ -1741,8 +1769,41 @@
         function advGetRem()     { return advGetBudget() - advGetUsed(); }
 
         function advReset() {
+            document.getElementById('advBudget').value = 130;
+            document.getElementById('advYear').value   = new Date().getFullYear();
             advData.days = new Array(12).fill(0);
+            localStorage.removeItem('wp_adv');
             advUpdateAll();
+        }
+
+        function planerReset() {
+            localStorage.removeItem('wp_planer');
+            // Alle Zeiträume entfernen
+            document.querySelectorAll('.period-item').forEach(el => el.remove());
+            periodCount = 0;
+            // Bundesland und 4-Tage-Woche zurücksetzen
+            document.getElementById('bundesland').value = '';
+            document.getElementById('fourDayWeek').checked = false;
+            // Ergebnisse ausblenden
+            document.getElementById('results').classList.remove('show');
+            document.getElementById('error').classList.remove('show');
+            document.getElementById('brueckentageSection').style.display = 'none';
+            // Default-Zeitraum erstellen
+            const today = new Date().toISOString().split('T')[0];
+            const yearEnd = `${new Date().getFullYear()}-12-31`;
+            addPeriod(today, yearEnd, 0, 0, 0);
+        }
+
+        function zeitrechnerReset() {
+            localStorage.removeItem('wp_zeit');
+            document.getElementById('workStart').value    = '';
+            document.getElementById('workEnd').value      = '';
+            document.getElementById('breakMinutes').value = '45';
+            document.getElementById('targetHours').value  = '';
+            document.getElementById('timeResults').classList.remove('show');
+            document.getElementById('timeError').classList.remove('show');
+            document.getElementById('timeWarning').classList.remove('show');
+            document.getElementById('overtimeCard').style.display = 'none';
         }
 
         function advChangeDay(monthIdx, delta) {
