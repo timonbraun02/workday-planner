@@ -41,10 +41,12 @@ Open [index.html](frontend/index.html) in any browser — no installation needed
 ```
 workday-planner/
 ├── frontend/
-│   └── index.html      ← entire app (HTML + CSS + JS, single file)
+│   ├── index.html      ← HTML-Markup
+│   ├── style.css       ← Styles (Light/Dark Mode, Layout)
+│   └── app.js          ← Gesamte Applikationslogik
 ├── .github/
 │   └── workflows/
-│       └── deploy.yml
+│       └── deploy.yml  ← GitHub Pages Deployment
 └── README.md
 ```
 
