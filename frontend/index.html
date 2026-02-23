@@ -576,6 +576,169 @@
             color: var(--text-muted);
         }
 
+        /* Mehrere Zeiträume */
+        .period-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .period-item {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: flex-end;
+            padding: 16px;
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            position: relative;
+            transition: border-color 0.2s;
+        }
+
+        .period-item:hover {
+            border-color: var(--accent);
+        }
+
+        .period-item .period-num {
+            position: absolute;
+            top: -10px;
+            left: 14px;
+            background: var(--accent);
+            color: white;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 20px;
+        }
+
+        .period-item .form-group {
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .btn-remove-period {
+            padding: 10px 14px;
+            background: var(--error-bg);
+            border: 2px solid var(--error-border);
+            color: var(--error-text);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.2s;
+            white-space: nowrap;
+            align-self: flex-end;
+        }
+
+        .btn-remove-period:hover {
+            background: #c33;
+            color: white;
+            border-color: #c33;
+        }
+
+        .btn-add-period {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: transparent;
+            border: 2px dashed var(--accent);
+            color: var(--accent);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-add-period:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* Brückentage */
+        .brueckentage-section {
+            margin-top: 20px;
+        }
+
+        .brueckentage-section h3 {
+            color: var(--accent);
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+        }
+
+        .brueckentag-card {
+            background: var(--bg-card);
+            border-left: 4px solid #43a047;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            box-shadow: var(--shadow-card);
+        }
+
+        body.dark .brueckentag-card {
+            border-left-color: #66bb6a;
+        }
+
+        .brueckentag-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+        }
+
+        .brueckentag-detail {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+
+        .brueckentag-gain {
+            display: inline-block;
+            margin-top: 5px;
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-radius: 12px;
+            padding: 2px 10px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        body.dark .brueckentag-gain {
+            background: #1b3a1e;
+            color: #a5d6a7;
+        }
+
+        /* Überstunden / Sollzeit */
+        .overtime-card {
+            background: var(--bg-card);
+            padding: 20px 25px;
+            border-radius: 10px;
+            box-shadow: var(--shadow-card);
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .overtime-card h3 {
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .overtime-value {
+            font-size: 2.2rem;
+            font-weight: bold;
+        }
+
+        .overtime-value.positive { color: #2e7d32; }
+        .overtime-value.negative { color: #c62828; }
+        .overtime-value.neutral  { color: var(--accent); }
+
+        body.dark .overtime-value.positive { color: #a5d6a7; }
+        body.dark .overtime-value.negative { color: #ef9a9a; }
+
         @media (max-width: 600px) {
             .header h1 {
                 font-size: 1.5rem;
@@ -609,29 +772,12 @@
         <div class="content">
             <form id="planForm">
                 <div class="form-section">
-                    <h2>Zeitraum</h2>
-                    <div class="quick-actions">
-                        <button type="button" class="btn-quick" onclick="setCurrentYear()">
-                            Aktuelles Jahr
-                        </button>
-                        <button type="button" class="btn-quick" onclick="setToYearEnd()">
-                            Heute bis Jahresende
-                        </button>
-                        <button type="button" class="btn-quick" onclick="setNextMonth()">
-                            Nächster Monat
-                        </button>
-                    </div>
-                    <div class="form-row">
+                    <h2>Zeiträume</h2>
+
+                    <!-- Globales Bundesland -->
+                    <div class="form-row" style="margin-bottom: 16px;">
                         <div class="form-group">
-                            <label for="startDate">Startdatum</label>
-                            <input type="date" id="startDate" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="endDate">Enddatum</label>
-                            <input type="date" id="endDate" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="bundesland">Bundesland</label>
+                            <label for="bundesland">Bundesland (für alle Zeiträume)</label>
                             <select id="bundesland">
                                 <option value="">Nur bundesweite Feiertage</option>
                                 <option value="BW">Baden-Württemberg</option>
@@ -653,24 +799,15 @@
                             </select>
                         </div>
                     </div>
+
+                    <!-- Dynamische Zeitraum-Liste -->
+                    <div class="period-list" id="periodList"></div>
+                    <button type="button" class="btn-add-period" onclick="addPeriod()">
+                        + Zeitraum hinzufügen
+                    </button>
                 </div>
 
-                <div class="form-section">
-                    <h2>Arbeitstage</h2>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="homeOfficeDays">Home Office Tage</label>
-                            <input type="number" id="homeOfficeDays" min="0" value="0" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="vacationDays">Urlaubstage</label>
-                            <input type="number" id="vacationDays" min="0" value="0" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="sickDays">Krankheitstage</label>
-                            <input type="number" id="sickDays" min="0" value="0" required>
-                        </div>
-                    </div>
+                <div class="form-section" style="margin-bottom: 10px;">
                     <div class="checkbox-group">
                         <input type="checkbox" id="fourDayWeek">
                         <label for="fourDayWeek" style="margin-bottom: 0;">4-Tage-Woche aktivieren</label>
@@ -741,6 +878,13 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Brückentage -->
+                <div class="brueckentage-section" id="brueckentageSection" style="display:none;">
+                    <h3>Brückentage im Zeitraum</h3>
+                    <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:10px;">Mit einem Urlaubstag an diesen Tagen erreichst du eine besonders lange Freizeit:</p>
+                    <div id="brueckentageList"></div>
+                </div>
             </div>
         </div>
         </div>
@@ -765,6 +909,10 @@
                         <div class="form-group">
                             <label for="breakMinutes">Pause (Minuten)</label>
                             <input type="number" id="breakMinutes" min="0" value="30" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="targetHours">Sollzeit (Stunden, optional)</label>
+                            <input type="number" id="targetHours" min="0" max="24" step="0.5" placeholder="z.B. 8">
                         </div>
                     </div>
                 </div>
@@ -799,6 +947,11 @@
                         <span class="stat-unit" style="font-size: 1.5rem;">h</span>
                     </div>
                 </div>
+                <div class="overtime-card" id="overtimeCard" style="display:none;">
+                    <h3>Soll-/Ist-Vergleich</h3>
+                    <div class="overtime-value" id="overtimeValue">+0:00</div>
+                    <p style="margin-top: 8px; font-size: 0.88rem; color: var(--text-muted);">Soll: <span id="targetDisplay">0:00</span> h &nbsp;|&nbsp; Ist: <span id="netTimeDisplay">0:00</span> h</p>
+                </div>
             </div>
         </div>
         </div>
@@ -825,7 +978,7 @@
                 </div>
                 <div class="form-group" style="flex: 0;">
                     <label style="visibility:hidden">Reset</label>
-                    <button type="button" class="btn-primary" style="padding: 12px 24px; font-size: 0.95rem; width: auto;" onclick="advReset()">↺ Zurücksetzen</button>
+                    <button type="button" class="btn-primary" style="padding: 12px 24px; font-size: 0.95rem; width: auto;" onclick="advReset()">Zurücksetzen</button>
                 </div>
             </div>
 
@@ -846,8 +999,8 @@
             </div>
 
             <!-- Warnungen -->
-            <div class="adv-warning" id="advWarn">⚠️ Du hast 90% deines HO-Budgets verplant!</div>
-            <div class="adv-danger" id="advDanger">🚨 Zu viele Tage verplant! Du überschreitest dein Budget um <span id="advOver">0</span> Tage.</div>
+            <div class="adv-warning" id="advWarn">Achtung: Du hast 90% deines HO-Budgets verplant!</div>
+            <div class="adv-danger" id="advDanger">Zu viele Tage verplant! Du überschreitest dein Budget um <span id="advOver">0</span> Tage.</div>
 
             <!-- Canvas Chart -->
             <div class="chart-wrapper">
@@ -1044,6 +1197,285 @@
             };
         }
 
+        /* =========================================================
+           MEHRERE ZEITRÄUME
+           ========================================================= */
+        let periodCount = 0;
+
+        function addPeriod(startVal, endVal, hoVal, vacVal, sickVal) {
+            periodCount++;
+            const id = periodCount;
+            const item = document.createElement('div');
+            item.className = 'period-item';
+            item.id = `period-${id}`;
+            item.innerHTML = `
+                <span class="period-num">Zeitraum ${id}</span>
+                <div style="width:100%; display:flex; flex-wrap:wrap; gap:6px; margin-bottom:4px;" class="period-quick"></div>
+                <div class="form-group">
+                    <label>Startdatum</label>
+                    <input type="date" class="p-start" value="${startVal || ''}" required>
+                </div>
+                <div class="form-group">
+                    <label>Enddatum</label>
+                    <input type="date" class="p-end" value="${endVal || ''}" required>
+                </div>
+                <div class="form-group">
+                    <label>HO-Tage</label>
+                    <input type="number" class="p-ho" min="0" value="${hoVal != null ? hoVal : 0}">
+                </div>
+                <div class="form-group">
+                    <label>Urlaubstage</label>
+                    <input type="number" class="p-vac" min="0" value="${vacVal != null ? vacVal : 0}">
+                </div>
+                <div class="form-group">
+                    <label>Krankheitstage</label>
+                    <input type="number" class="p-sick" min="0" value="${sickVal != null ? sickVal : 0}">
+                </div>
+                <button type="button" class="btn-remove-period" onclick="removePeriod(${id})" title="Zeitraum entfernen">✕</button>
+            `;
+            document.getElementById('periodList').appendChild(item);
+            refreshPeriodNumbers();
+        }
+
+        /* Berechnet sinnvolle Quick-Buttons abhängig von der Position des Zeitraums */
+        function buildPeriodQuickActions(item, id) {
+            const bar = item.querySelector('.period-quick');
+            const idx = Array.from(document.querySelectorAll('.period-item')).indexOf(item);
+            const now = new Date();
+            const y   = now.getFullYear();
+            const m   = now.getMonth();
+
+            const btn = (label, fn) => {
+                const b = document.createElement('button');
+                b.type = 'button';
+                b.className = 'btn-quick';
+                b.style.fontSize = '0.78rem';
+                b.style.padding  = '5px 10px';
+                b.textContent = label;
+                b.addEventListener('click', () => fn(item));
+                bar.appendChild(b);
+            };
+
+            const set = (el, s, e) => {
+                el.querySelector('.p-start').value = s;
+                el.querySelector('.p-end').value   = e;
+            };
+
+            // Aktuellen Monat berechnen
+            const curMonStart = new Date(y, m, 1).toISOString().split('T')[0];
+            const curMonEnd   = new Date(y, m + 1, 0).toISOString().split('T')[0];
+            // Nächsten Monat berechnen
+            const nm = new Date(y, m + 1, 1);
+            const nmStart = nm.toISOString().split('T')[0];
+            const nmEnd   = new Date(nm.getFullYear(), nm.getMonth() + 1, 0).toISOString().split('T')[0];
+            // Quartale
+            const curQ  = Math.floor(m / 3);
+            const curQS = new Date(y, curQ * 3, 1).toISOString().split('T')[0];
+            const curQE = new Date(y, curQ * 3 + 3, 0).toISOString().split('T')[0];
+            const nqRaw = curQ + 1;
+            const nqY   = y + Math.floor(nqRaw / 4);
+            const nqM   = (nqRaw % 4) * 3;
+            const nqS   = new Date(nqY, nqM, 1).toISOString().split('T')[0];
+            const nqE   = new Date(nqY, nqM + 3, 0).toISOString().split('T')[0];
+
+            if (idx === 0) {
+                // Erster Zeitraum: Jahres-Shortcuts
+                btn('Akt. Jahr',        el => set(el, `${y}-01-01`,    `${y}-12-31`));
+                btn('Heute → Jahresende', el => set(el, now.toISOString().split('T')[0], `${y}-12-31`));
+                btn('Nächstes Jahr',    el => set(el, `${y+1}-01-01`,  `${y+1}-12-31`));
+                btn('H1 ' + y,         el => set(el, `${y}-01-01`,    `${y}-06-30`));
+                btn('H2 ' + y,         el => set(el, `${y}-07-01`,    `${y}-12-31`));
+            } else {
+                // Weitere Zeiträume: kein Jahres-Shortcut, aber beide Jahre für Halbjahre
+                btn('H1 ' + y,         el => set(el, `${y}-01-01`,    `${y}-06-30`));
+                btn('H2 ' + y,         el => set(el, `${y}-07-01`,    `${y}-12-31`));
+                btn('H1 ' + (y+1),     el => set(el, `${y+1}-01-01`,  `${y+1}-06-30`));
+                btn('H2 ' + (y+1),     el => set(el, `${y+1}-07-01`,  `${y+1}-12-31`));
+            }
+
+            // Für alle Zeiträume: Monats- und Quartals-Shortcuts
+            btn('Akt. Monat',      el => set(el, curMonStart, curMonEnd));
+            btn('Nächster Monat',  el => set(el, nmStart,     nmEnd));
+            btn('Akt. Quartal',    el => set(el, curQS,       curQE));
+            btn('Nächstes Quartal',el => set(el, nqS,         nqE));
+        }
+
+        function removePeriod(id) {
+            const el = document.getElementById(`period-${id}`);
+            if (el) el.remove();
+            refreshPeriodNumbers();
+        }
+
+        function refreshPeriodNumbers() {
+            const items = document.querySelectorAll('.period-item');
+            items.forEach((item, i) => {
+                const numEl = item.querySelector('.period-num');
+                if (numEl) numEl.textContent = `Zeitraum ${i + 1}`;
+                // Remove-Button nur ausblenden wenn nur noch 1 Zeitraum
+                const removeBtn = item.querySelector('.btn-remove-period');
+                if (removeBtn) removeBtn.style.display = items.length > 1 ? '' : 'none';
+                // Quick-Buttons neu bauen (Reihenfolge kann sich geändert haben)
+                const bar = item.querySelector('.period-quick');
+                if (bar) { bar.innerHTML = ''; buildPeriodQuickActions(item, parseInt(item.id.replace('period-',''))); }
+            });
+        }
+
+        function getPeriodsFormData() {
+            const bl = document.getElementById('bundesland').value || null;
+            const fourDay = document.getElementById('fourDayWeek').checked;
+            const items = document.querySelectorAll('.period-item');
+            return Array.from(items).map(item => ({
+                start_date: item.querySelector('.p-start').value,
+                end_date:   item.querySelector('.p-end').value,
+                home_office_days: parseInt(item.querySelector('.p-ho').value) || 0,
+                vacation_days:    parseInt(item.querySelector('.p-vac').value) || 0,
+                sick_days:        parseInt(item.querySelector('.p-sick').value) || 0,
+                four_day_week: fourDay,
+                custom_closed_dates: [],
+                bundesland: bl
+            }));
+        }
+
+        /* =========================================================
+           BRÜCKENTAGE
+           ========================================================= */
+        function findBrueckentage(startDateStr, endDateStr, bundesland) {
+            const start = new Date(startDateStr + 'T00:00:00Z');
+            const end   = new Date(endDateStr   + 'T00:00:00Z');
+            const holidays = getGermanHolidays(
+                start.getUTCFullYear(), end.getUTCFullYear(), bundesland || null
+            );
+
+            const results = [];
+            const checked = new Set();
+
+            // Für jeden Feiertag im Zeitraum prüfen
+            holidays.forEach(hStr => {
+                const h = new Date(hStr + 'T00:00:00Z');
+                if (h < start || h > end) return;
+
+                const dow = h.getUTCDay(); // 0=So, 1=Mo...5=Fr, 6=Sa
+                if (dow === 0 || dow === 6) return; // Feiertag am WE bringt nichts
+
+                const hName = getHolidayName(hStr, holidays, bundesland);
+
+                // Feiertag ist Montag → Brücke Fr davor
+                if (dow === 1) {
+                    const fri = new Date(h); fri.setUTCDate(fri.getUTCDate() - 3);
+                    const friStr = fri.toISOString().substring(0, 10);
+                    if (!holidays.has(friStr) && fri >= start && fri <= end && !checked.has(friStr)) {
+                        checked.add(friStr);
+                        results.push({ urlaubstag: friStr, reason: `Brücke vor ${hName}`, total: 4 });
+                    }
+                }
+
+                // Feiertag ist Freitag → Brücke Mo danach
+                if (dow === 5) {
+                    const mon = new Date(h); mon.setUTCDate(mon.getUTCDate() + 3);
+                    const monStr = mon.toISOString().substring(0, 10);
+                    if (!holidays.has(monStr) && mon >= start && mon <= end && !checked.has(monStr)) {
+                        checked.add(monStr);
+                        results.push({ urlaubstag: monStr, reason: `Brücke nach ${hName}`, total: 4 });
+                    }
+                }
+
+                // Feiertag ist Dienstag → Montag als Brücke
+                if (dow === 2) {
+                    const mon = new Date(h); mon.setUTCDate(mon.getUTCDate() - 1);
+                    const monStr = mon.toISOString().substring(0, 10);
+                    if (!holidays.has(monStr) && mon >= start && mon <= end && !checked.has(monStr)) {
+                        checked.add(monStr);
+                        results.push({ urlaubstag: monStr, reason: `Brücke vor ${hName}`, total: 4 });
+                    }
+                }
+
+                // Feiertag ist Donnerstag → Freitag als Brücke
+                if (dow === 4) {
+                    const fri = new Date(h); fri.setUTCDate(fri.getUTCDate() + 1);
+                    const friStr = fri.toISOString().substring(0, 10);
+                    if (!holidays.has(friStr) && fri >= start && fri <= end && !checked.has(friStr)) {
+                        checked.add(friStr);
+                        results.push({ urlaubstag: friStr, reason: `Brücke nach ${hName}`, total: 4 });
+                    }
+                }
+            });
+
+            return results.sort((a, b) => a.urlaubstag.localeCompare(b.urlaubstag));
+        }
+
+        // Feiertags-Namen-Lookup (lazy per Jahr)
+        const _holidayNameCache = {};
+        function buildHolidayNames(year, bundesland) {
+            const key = `${year}-${bundesland || ''}`;
+            if (_holidayNameCache[key]) return _holidayNameCache[key];
+            const bl = bundesland ? bundesland.toUpperCase() : null;
+            const e  = getEaster(year);
+            const map = {};
+            const add = (dateStr, name) => { if (!map[dateStr]) map[dateStr] = name; };
+            add(fixed(year,1,1),       'Neujahr');
+            add(easterPlus(e,-2),      'Karfreitag');
+            add(easterPlus(e,0),       'Ostersonntag');
+            add(easterPlus(e,1),       'Ostermontag');
+            add(fixed(year,5,1),       'Tag der Arbeit');
+            add(easterPlus(e,39),      'Christi Himmelfahrt');
+            add(easterPlus(e,49),      'Pfingstsonntag');
+            add(easterPlus(e,50),      'Pfingstmontag');
+            add(easterPlus(e,60),      'Fronleichnam');
+            add(fixed(year,10,3),      'Tag der Deutschen Einheit');
+            add(fixed(year,12,25),     '1. Weihnachtstag');
+            add(fixed(year,12,26),     '2. Weihnachtstag');
+            if (bl) {
+                add(fixed(year,1,6),   'Heilige Drei Könige');
+                add(fixed(year,3,8),   'Internationaler Frauentag');
+                add(fixed(year,8,15),  'Mariä Himmelfahrt');
+                add(fixed(year,9,20),  'Weltkindertag');
+                add(fixed(year,10,31), 'Reformationstag');
+                add(fixed(year,11,1),  'Allerheiligen');
+                add(getBussUndBettag(year), 'Buß- und Bettag');
+            }
+            _holidayNameCache[key] = map;
+            return map;
+        }
+
+        function getHolidayName(dateStr, holidaySet, bundesland) {
+            const year = parseInt(dateStr.substring(0,4));
+            const names = buildHolidayNames(year, bundesland);
+            return names[dateStr] || formatDateDE(dateStr);
+        }
+
+        function formatDateDE(dateStr) {
+            if (!dateStr) return '';
+            const [y, m, d] = dateStr.split('-');
+            return `${d}.${m}.${y}`;
+        }
+
+        function renderBrueckentage(allPeriods) {
+            const bl = document.getElementById('bundesland').value || null;
+            const allBT = [];
+            allPeriods.forEach(p => {
+                if (!p.start_date || !p.end_date) return;
+                findBrueckentage(p.start_date, p.end_date, bl).forEach(bt => {
+                    if (!allBT.find(x => x.urlaubstag === bt.urlaubstag))
+                        allBT.push(bt);
+                });
+            });
+
+            const section = document.getElementById('brueckentageSection');
+            const list    = document.getElementById('brueckentageList');
+            if (allBT.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+            section.style.display = 'block';
+            list.innerHTML = allBT.map(bt => `
+                <div class="brueckentag-card">
+                    <div class="brueckentag-title">${formatDateDE(bt.urlaubstag)} – 1 Urlaubstag nehmen</div>
+                    <div class="brueckentag-detail">${bt.reason}</div>
+                    <span class="brueckentag-gain">${bt.total} freie Tage am Stück</span>
+                </div>
+            `).join('');
+        }
+
         // Tab switching
         function switchTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
@@ -1103,9 +1535,9 @@
             // ArbZG-Warnungen
             const warnings = [];
             if (grossMinutes > 9 * 60 && breakMin < 45)
-                warnings.push(`⚠ Bei mehr als 9h Arbeitszeit schreibt das Arbeitszeitgesetz mindestens 45 Minuten Pause vor (eingetragen: ${breakMin} min).`);
+                warnings.push(`Achtung: Bei mehr als 9h Arbeitszeit schreibt das Arbeitszeitgesetz mindestens 45 Minuten Pause vor (eingetragen: ${breakMin} min).`);
             if (netMinutes > 10 * 60)
-                warnings.push(`⚠ Die Netto-Arbeitszeit überschreitet 10 Stunden — das ist nach ArbZG §3 nicht zulässig.`);
+                warnings.push(`Hinweis: Die Netto-Arbeitszeit überschreitet 10 Stunden — das ist nach ArbZG §3 nicht zulässig.`);
 
             const warningDiv = document.getElementById('timeWarning');
             if (warnings.length > 0) {
@@ -1119,49 +1551,66 @@
             document.getElementById('breakTime').textContent = formatMinutes(breakMin);
             document.getElementById('netTime').textContent = formatMinutes(netMinutes);
 
+            // Sollzeit-Vergleich
+            const targetHoursVal = document.getElementById('targetHours').value;
+            const overtimeCard   = document.getElementById('overtimeCard');
+            if (targetHoursVal !== '') {
+                const targetMin  = Math.round(parseFloat(targetHoursVal) * 60);
+                const deltaMin   = netMinutes - targetMin;
+                const absMin     = Math.abs(deltaMin);
+                const sign       = deltaMin >= 0 ? '+' : '−';
+                const valueEl    = document.getElementById('overtimeValue');
+                valueEl.textContent = `${sign}${formatMinutes(absMin)} h`;
+                valueEl.className   = 'overtime-value ' + (deltaMin > 0 ? 'positive' : deltaMin < 0 ? 'negative' : 'neutral');
+                document.getElementById('targetDisplay').textContent  = formatMinutes(targetMin);
+                document.getElementById('netTimeDisplay').textContent = formatMinutes(netMinutes);
+                overtimeCard.style.display = 'block';
+            } else {
+                overtimeCard.style.display = 'none';
+            }
+
             document.getElementById('timeError').classList.remove('show');
             document.getElementById('timeResults').classList.add('show');
         });
 
-        function setCurrentYear() {
-            const now = new Date();
-            document.getElementById('startDate').value = `${now.getFullYear()}-01-01`;
-            document.getElementById('endDate').value = `${now.getFullYear()}-12-31`;
-        }
-
-        function setToYearEnd() {
-            const now = new Date();
-            const today = now.toISOString().split('T')[0];
-            document.getElementById('startDate').value = today;
-            document.getElementById('endDate').value = `${now.getFullYear()}-12-31`;
-        }
-
-        function setNextMonth() {
-            const now = new Date();
-            const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-            const lastDay = new Date(nextMonth.getFullYear(), nextMonth.getMonth() + 1, 0);
-            
-            document.getElementById('startDate').value = nextMonth.toISOString().split('T')[0];
-            document.getElementById('endDate').value = lastDay.toISOString().split('T')[0];
-        }
+        // (Quick-Actions sind jetzt direkt in den Zeitraum-Karten)
 
         document.getElementById('planForm').addEventListener('submit', (e) => {
             e.preventDefault();
 
-            const formData = {
-                start_date: document.getElementById('startDate').value,
-                end_date: document.getElementById('endDate').value,
-                home_office_days: parseInt(document.getElementById('homeOfficeDays').value),
-                vacation_days: parseInt(document.getElementById('vacationDays').value),
-                sick_days: parseInt(document.getElementById('sickDays').value),
-                four_day_week: document.getElementById('fourDayWeek').checked,
-                custom_closed_dates: [],
-                bundesland: document.getElementById('bundesland').value || null
-            };
+            const periods = getPeriodsFormData();
 
             try {
-                const result = calculateWorkdays(formData);
-                displayResults(result);
+                // Ergebnisse aller Zeiträume summieren
+                const combined = {
+                    total_calendar_days: 0, total_workdays: 0,
+                    required_office_days: 0, home_office_days: 0,
+                    vacation_days: 0, sick_days: 0,
+                    weekend_days: 0, public_holidays: 0,
+                    custom_closed_days: 0, four_day_week_off_days: 0,
+                    office_attendance_percentage: 0
+                };
+                for (const p of periods) {
+                    if (!p.start_date || !p.end_date) throw new Error('Bitte alle Zeiträume mit Start- und Enddatum befüllen');
+                    const r = calculateWorkdays(p);
+                    combined.total_calendar_days   += r.total_calendar_days;
+                    combined.total_workdays        += r.total_workdays;
+                    combined.required_office_days  += r.required_office_days;
+                    combined.home_office_days      += r.home_office_days;
+                    combined.vacation_days         += r.vacation_days;
+                    combined.sick_days             += r.sick_days;
+                    combined.weekend_days          += r.weekend_days;
+                    combined.public_holidays       += r.public_holidays;
+                    combined.custom_closed_days    += r.custom_closed_days;
+                    combined.four_day_week_off_days+= r.four_day_week_off_days;
+                }
+                const availTotal = combined.total_workdays - combined.vacation_days - combined.sick_days;
+                combined.office_attendance_percentage = availTotal > 0
+                    ? Math.round(combined.required_office_days / availTotal * 10000) / 100
+                    : 0;
+
+                displayResults(combined);
+                renderBrueckentage(periods);
                 hideError();
             } catch (error) {
                 showError(error.message);
@@ -1195,7 +1644,13 @@
             document.getElementById('error').classList.remove('show');
         }
 
-        setToYearEnd();
+        // Ersten Zeitraum erstellen und vorbelegen
+        (function initPeriods() {
+            const now     = new Date();
+            const today   = now.toISOString().split('T')[0];
+            const yearEnd = `${now.getFullYear()}-12-31`;
+            addPeriod(today, yearEnd, 0, 0, 0);
+        })();
 
         /* =========================================================
            ADVANCED HO DAY PLANER
@@ -1458,6 +1913,7 @@
         /* Catmull-Rom Spline Pfad */
         function advSplinePath(ctx, data, xPos, yPos) {
             const pts = data.map((v, i) => [xPos(i), yPos(v)]);
+            const yFloor = yPos(0); // Canvas-Y der Nulllinie (größter Y-Wert = unten)
             ctx.moveTo(pts[0][0], pts[0][1]);
             for (let i = 0; i < pts.length - 1; i++) {
                 const p0 = pts[Math.max(i - 1, 0)];
@@ -1465,9 +1921,9 @@
                 const p2 = pts[i + 1];
                 const p3 = pts[Math.min(i + 2, pts.length - 1)];
                 const cp1x = p1[0] + (p2[0] - p0[0]) / 6;
-                const cp1y = p1[1] + (p2[1] - p0[1]) / 6;
+                const cp1y = Math.min(yFloor, p1[1] + (p2[1] - p0[1]) / 6);
                 const cp2x = p2[0] - (p3[0] - p1[0]) / 6;
-                const cp2y = p2[1] - (p3[1] - p1[1]) / 6;
+                const cp2y = Math.min(yFloor, p2[1] - (p3[1] - p1[1]) / 6);
                 ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2[0], p2[1]);
             }
         }
