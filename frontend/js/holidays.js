@@ -132,7 +132,7 @@ function findBrueckentage(startDateStr, endDateStr, bundesland) {
             const friStr = fri.toISOString().substring(0, 10);
             if (!holidays.has(friStr) && fri >= start && fri <= end && !checked.has(friStr)) {
                 checked.add(friStr);
-                results.push({ urlaubstag: friStr, reason: `Brücke vor ${hName}`, total: 4 });
+                results.push({ urlaubstag: friStr, reason: `${t('bridgeBefore')} ${hName}`, total: 4 });
             }
         }
 
@@ -142,7 +142,7 @@ function findBrueckentage(startDateStr, endDateStr, bundesland) {
             const monStr = mon.toISOString().substring(0, 10);
             if (!holidays.has(monStr) && mon >= start && mon <= end && !checked.has(monStr)) {
                 checked.add(monStr);
-                results.push({ urlaubstag: monStr, reason: `Brücke nach ${hName}`, total: 4 });
+                results.push({ urlaubstag: monStr, reason: `${t('bridgeAfter')} ${hName}`, total: 4 });
             }
         }
 
@@ -152,7 +152,7 @@ function findBrueckentage(startDateStr, endDateStr, bundesland) {
             const monStr = mon.toISOString().substring(0, 10);
             if (!holidays.has(monStr) && mon >= start && mon <= end && !checked.has(monStr)) {
                 checked.add(monStr);
-                results.push({ urlaubstag: monStr, reason: `Brücke vor ${hName}`, total: 4 });
+                results.push({ urlaubstag: monStr, reason: `${t('bridgeBefore')} ${hName}`, total: 4 });
             }
         }
 
@@ -162,7 +162,7 @@ function findBrueckentage(startDateStr, endDateStr, bundesland) {
             const friStr = fri.toISOString().substring(0, 10);
             if (!holidays.has(friStr) && fri >= start && fri <= end && !checked.has(friStr)) {
                 checked.add(friStr);
-                results.push({ urlaubstag: friStr, reason: `Brücke nach ${hName}`, total: 4 });
+                results.push({ urlaubstag: friStr, reason: `${t('bridgeAfter')} ${hName}`, total: 4 });
             }
         }
     });
@@ -190,9 +190,9 @@ function renderBrueckentage(allPeriods) {
     section.style.display = 'block';
     list.innerHTML = allBT.map(bt => `
         <div class="brueckentag-card">
-            <div class="brueckentag-title">${formatDateDE(bt.urlaubstag)} – 1 Urlaubstag nehmen</div>
+            <div class="brueckentag-title">${formatDateDE(bt.urlaubstag)} – ${t('bridgeDayAction')}</div>
             <div class="brueckentag-detail">${bt.reason}</div>
-            <span class="brueckentag-gain">${bt.total} freie Tage am Stück</span>
+            <span class="brueckentag-gain">${t('bridgeFreeDays', bt.total)}</span>
         </div>
     `).join('');
 }

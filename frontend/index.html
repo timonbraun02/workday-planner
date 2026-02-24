@@ -9,29 +9,30 @@
 <body>
     <div class="container">
         <div class="header">
+            <button class="lang-toggle" id="langBtn" title="Sprache wechseln"><span class="lang-active">DE</span> | <span class="lang-inactive">EN</span></button>
             <button class="theme-toggle" id="themeBtn" title="Dark Mode umschalten">&#9790;</button>
-            <h1>Workday Planner</h1>
-            <p>Optimiere deine Home Office Tage effizient</p>
+            <h1 data-i18n="headerTitle">Workday Planner</h1>
+            <p data-i18n="headerSubtitle">Optimiere deine Home Office Tage effizient</p>
         </div>
 
         <div class="tab-nav">
-            <button class="tab-btn active" data-tab="planer">HO-Planer</button>
-            <button class="tab-btn" data-tab="zeitrechner">Arbeitszeitrechner</button>
-            <button class="tab-btn" data-tab="advanced">Monatsplanung</button>
+            <button class="tab-btn active" data-tab="planer" data-i18n="tabPlaner">HO-Planer</button>
+            <button class="tab-btn" data-tab="zeitrechner" data-i18n="tabZeitrechner">Arbeitszeitrechner</button>
+            <button class="tab-btn" data-tab="advanced" data-i18n="tabAdvanced">Monatsplanung</button>
         </div>
 
         <div id="tab-planer" class="tab-content active">
         <div class="content">
             <form id="planForm">
                 <div class="form-section">
-                    <h2>Zeiträume</h2>
+                    <h2 data-i18n="periodsTitle">Zeiträume</h2>
 
                     <!-- Globales Bundesland -->
                     <div class="form-row" style="margin-bottom: 16px;">
                         <div class="form-group">
-                            <label for="bundesland">Bundesland (für alle Zeiträume)</label>
+                            <label for="bundesland" data-i18n="bundeslandLabel">Bundesland (für alle Zeiträume)</label>
                             <select id="bundesland">
-                                <option value="">Nur bundesweite Feiertage</option>
+                                <option value="" data-i18n="bundeslandDefault">Nur bundesweite Feiertage</option>
                                 <option value="BW">Baden-Württemberg</option>
                                 <option value="BY">Bayern</option>
                                 <option value="BE">Berlin</option>
@@ -58,94 +59,94 @@
 
                 <div class="advanced-options">
                     <button type="button" class="btn-advanced-toggle" id="btnAdvancedOptions">
-                        <span>Erweiterte Optionen</span>
+                        <span data-i18n="advancedOptions">Erweiterte Optionen</span>
                     </button>
                     <div class="advanced-options-content" id="advancedOptionsContent">
-                        <button type="button" class="btn-add-period" id="btnAddPeriod">
+                        <button type="button" class="btn-add-period" id="btnAddPeriod" data-i18n="addPeriod">
                             + Zeitraum hinzufügen
                         </button>
                         <div class="checkbox-group">
                             <input type="checkbox" id="fourDayWeek">
-                            <label for="fourDayWeek">4-Tage-Woche aktivieren</label>
+                            <label for="fourDayWeek" data-i18n="fourDayWeek">4-Tage-Woche aktivieren</label>
                         </div>
-                        <p class="option-hint">
+                        <p class="option-hint" data-i18n="fourDayWeekHint">
                             Pro Arbeitswoche wird ein Tag abgezogen. Sinnvoll wenn du z.B. freitags generell nicht arbeitest.
                         </p>
                     </div>
                 </div>
 
                 <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                    <button type="submit" class="btn-primary">Berechnen</button>
-                    <button type="button" class="btn-secondary" id="btnPlanerReset">Zurücksetzen</button>
+                    <button type="submit" class="btn-primary" data-i18n="calculate">Berechnen</button>
+                    <button type="button" class="btn-secondary" id="btnPlanerReset" data-i18n="reset">Zurücksetzen</button>
                 </div>
             </form>
 
             <div id="error" class="error"></div>
 
             <div id="results" class="results">
-                <h2>Ergebnis</h2>
+                <h2 data-i18n="resultTitle">Ergebnis</h2>
 
                 <div class="highlight-card">
-                    <h3>Erforderliche Bürotage</h3>
+                    <h3 data-i18n="requiredOfficeDays">Erforderliche Bürotage</h3>
                     <div class="highlight-value">
                         <span id="requiredOfficeDays">0</span>
                     </div>
-                    <p style="margin-top: 10px; color: #666;">
+                    <p id="officePercentText" style="margin-top: 10px; color: #666;">
                         Das sind <strong id="officePercentage">0</strong>% deiner verfügbaren Arbeitstage
                     </p>
                 </div>
 
                 <div class="stats-grid" style="margin-top: 15px;">
                     <div class="stat-card">
-                        <div class="stat-label">Bürotage pro Woche</div>
+                        <div class="stat-label" data-i18n="officeDaysPerWeek">Bürotage pro Woche</div>
                         <div class="stat-value">
                             <span id="officeDaysPerWeek">0</span>
-                            <span class="stat-unit">Tage / Woche</span>
+                            <span class="stat-unit" data-i18n="daysPerWeek">Tage / Woche</span>
                         </div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-label">Bürotage pro Monat</div>
+                        <div class="stat-label" data-i18n="officeDaysPerMonth">Bürotage pro Monat</div>
                         <div class="stat-value">
                             <span id="officeDaysPerMonth">0</span>
-                            <span class="stat-unit">Tage / Monat</span>
+                            <span class="stat-unit" data-i18n="daysPerMonth">Tage / Monat</span>
                         </div>
                     </div>
                 </div>
 
-                <button type="button" class="btn-transfer" id="btnTransferBudget">
+                <button type="button" class="btn-transfer" id="btnTransferBudget" data-i18n="transferBudget">
                     HO-Tage in Monatsplanung übernehmen
                 </button>
 
-                <button type="button" class="btn-details-toggle" id="btnDetailsToggle">Details anzeigen</button>
+                <button type="button" class="btn-details-toggle" id="btnDetailsToggle" data-i18n="showDetails">Details anzeigen</button>
 
                 <div class="results-details" id="resultsDetails">
                     <div class="stats-grid">
                         <div class="stat-card">
-                            <div class="stat-label">Kalendertage</div>
+                            <div class="stat-label" data-i18n="calendarDays">Kalendertage</div>
                             <div class="stat-value">
                                 <span id="totalCalendarDays">0</span>
-                                <span class="stat-unit">Tage</span>
+                                <span class="stat-unit" data-i18n="days">Tage</span>
                             </div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-label">Arbeitstage gesamt</div>
+                            <div class="stat-label" data-i18n="totalWorkdays">Arbeitstage gesamt</div>
                             <div class="stat-value">
                                 <span id="totalWorkdays">0</span>
-                                <span class="stat-unit">Tage</span>
+                                <span class="stat-unit" data-i18n="days">Tage</span>
                             </div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-label">Wochenendtage</div>
+                            <div class="stat-label" data-i18n="weekendDays">Wochenendtage</div>
                             <div class="stat-value">
                                 <span id="weekendDays">0</span>
-                                <span class="stat-unit">Tage</span>
+                                <span class="stat-unit" data-i18n="days">Tage</span>
                             </div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-label">Feiertage</div>
+                            <div class="stat-label" data-i18n="publicHolidays">Feiertage</div>
                             <div class="stat-value">
                                 <span id="publicHolidays">0</span>
-                                <span class="stat-unit">Tage</span>
+                                <span class="stat-unit" data-i18n="days">Tage</span>
                             </div>
                         </div>
                     </div>
@@ -153,17 +154,17 @@
                     <!-- Wochenplanung -->
                     <div class="stats-grid" id="weekPlanSection">
                         <div class="stat-card">
-                            <div class="stat-label">Wochen im Zeitraum</div>
+                            <div class="stat-label" data-i18n="weeksInPeriod">Wochen im Zeitraum</div>
                             <div class="stat-value">
                                 <span id="totalWeeks">0</span>
-                                <span class="stat-unit">Wochen</span>
+                                <span class="stat-unit" data-i18n="weeks">Wochen</span>
                             </div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-label">Wochen mit 2× Büro</div>
+                            <div class="stat-label" data-i18n="weeksWithDouble">Wochen mit 2× Büro</div>
                             <div class="stat-value">
                                 <span id="weeksWithDouble">0</span>
-                                <span class="stat-unit">Wochen</span>
+                                <span class="stat-unit" data-i18n="weeks">Wochen</span>
                             </div>
                         </div>
                     </div>
@@ -171,8 +172,8 @@
 
                 <!-- Brückentage -->
                 <div class="brueckentage-section" id="brueckentageSection" style="display:none;">
-                    <h3>Brückentage im Zeitraum</h3>
-                    <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:10px;">Mit einem Urlaubstag an diesen Tagen erreichst du eine besonders lange Freizeit:</p>
+                    <h3 data-i18n="bridgeDaysTitle">Brückentage im Zeitraum</h3>
+                    <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:10px;" data-i18n="bridgeDaysHint">Mit einem Urlaubstag an diesen Tagen erreichst du eine besonders lange Freizeit:</p>
                     <div id="brueckentageList"></div>
                 </div>
             </div>
@@ -183,32 +184,32 @@
         <div class="content">
             <form id="timeForm">
                 <div class="form-section">
-                    <h2>Arbeitszeit berechnen</h2>
+                    <h2 data-i18n="timeCalcTitle">Arbeitszeit berechnen</h2>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="workStart">Arbeitsbeginn</label>
+                            <label for="workStart" data-i18n="workStart">Arbeitsbeginn</label>
                             <input type="time" id="workStart" required>
                         </div>
                         <div class="form-group">
-                            <label for="workEnd">Arbeitsende</label>
+                            <label for="workEnd" data-i18n="workEnd">Arbeitsende</label>
                             <div style="display: flex; gap: 8px;">
                                 <input type="time" id="workEnd" required style="flex: 1;">
-                                <button type="button" class="btn-quick" id="btnSetEndNow">Jetzt</button>
+                                <button type="button" class="btn-quick" id="btnSetEndNow" data-i18n="now">Jetzt</button>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="breakMinutes">Pause (Minuten)</label>
+                            <label for="breakMinutes" data-i18n="breakMinutes">Pause (Minuten)</label>
                             <input type="number" id="breakMinutes" min="0" value="45" required>
                         </div>
                         <div class="form-group">
-                            <label for="targetHours">Sollzeit (Stunden, optional)</label>
-                            <input type="number" id="targetHours" min="0" max="24" step="0.5" placeholder="z.B. 8">
+                            <label for="targetHours" data-i18n="targetHours">Sollzeit (Stunden, optional)</label>
+                            <input type="number" id="targetHours" min="0" max="24" step="0.5" placeholder="z.B. 8" data-i18n-placeholder="targetPlaceholder">
                         </div>
                     </div>
                 </div>
                 <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                    <button type="submit" class="btn-primary">Berechnen</button>
-                    <button type="button" class="btn-secondary" id="btnZeitrechnerReset">Zurücksetzen</button>
+                    <button type="submit" class="btn-primary" data-i18n="calculate">Berechnen</button>
+                    <button type="button" class="btn-secondary" id="btnZeitrechnerReset" data-i18n="reset">Zurücksetzen</button>
                 </div>
             </form>
 
@@ -216,17 +217,17 @@
             <div id="timeWarning" class="warning"></div>
 
             <div id="timeResults" class="results">
-                <h2>Ergebnis</h2>
+                <h2 data-i18n="resultTitle">Ergebnis</h2>
                 <div class="stats-grid">
                     <div class="stat-card">
-                        <div class="stat-label">Brutto-Arbeitszeit</div>
+                        <div class="stat-label" data-i18n="grossTime">Brutto-Arbeitszeit</div>
                         <div class="stat-value">
                             <span id="grossTime">0:00</span>
                             <span class="stat-unit">h</span>
                         </div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-label">Pause</div>
+                        <div class="stat-label" data-i18n="breakTime">Pause</div>
                         <div class="stat-value">
                             <span id="breakTime">0:00</span>
                             <span class="stat-unit">h</span>
@@ -234,16 +235,16 @@
                     </div>
                 </div>
                 <div class="highlight-card">
-                    <h3>Netto-Arbeitszeit</h3>
+                    <h3 data-i18n="netTime">Netto-Arbeitszeit</h3>
                     <div class="highlight-value">
                         <span id="netTime">0:00</span>
                         <span class="stat-unit" style="font-size: 1.5rem;">h</span>
                     </div>
                 </div>
                 <div class="overtime-card" id="overtimeCard" style="display:none;">
-                    <h3>Soll-/Ist-Vergleich</h3>
+                    <h3 data-i18n="comparison">Soll-/Ist-Vergleich</h3>
                     <div class="overtime-value" id="overtimeValue">+0:00</div>
-                    <p style="margin-top: 8px; font-size: 0.88rem; color: var(--text-muted);">Soll: <span id="targetDisplay">0:00</span> h &nbsp;|&nbsp; Ist: <span id="netTimeDisplay">0:00</span> h</p>
+                    <p style="margin-top: 8px; font-size: 0.88rem; color: var(--text-muted);"><span data-i18n="comparisonTarget">Soll</span>: <span id="targetDisplay">0:00</span> h &nbsp;|&nbsp; <span data-i18n="comparisonActual">Ist</span>: <span id="netTimeDisplay">0:00</span> h</p>
                 </div>
             </div>
         </div>
@@ -253,54 +254,54 @@
         <div id="tab-advanced" class="tab-content">
         <div class="content">
             <div class="form-section">
-                <h2>Monatsplanung</h2>
-                <p style="color: var(--text-muted); margin-bottom: 8px; font-size: 0.95rem;">
+                <h2 data-i18n="advTitle">Monatsplanung</h2>
+                <p style="color: var(--text-muted); margin-bottom: 8px; font-size: 0.95rem;" data-i18n="advDescription">
                     Verteile deine HO- und Urlaubstage auf die einzelnen Monate des Jahres.
                 </p>
-                <p style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 18px;">
-                    ℹ️ Feiertage werden anhand des Bundeslandes aus dem <strong>HO-Planer</strong> (Tab 1) berechnet.
+                <p style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 18px;" data-i18n="advHolidayHint">
+                    ℹ️ Feiertage werden anhand des Bundeslandes aus dem HO-Planer (Tab 1) berechnet.
                 </p>
             </div>
 
             <!-- Einstellungen -->
             <div class="adv-settings">
                 <div class="form-group">
-                    <label for="advYear">Jahr</label>
+                    <label for="advYear" data-i18n="advYear">Jahr</label>
                     <input type="number" id="advYear" min="2020" max="2040" value="2026">
                 </div>
                 <div class="form-group">
-                    <label for="advBudget">Verfügbare HO-Tage (Jahresbudget)</label>
+                    <label for="advBudget" data-i18n="advBudget">Verfügbare HO-Tage (Jahresbudget)</label>
                     <input type="number" id="advBudget" min="0" max="365" value="130">
                 </div>
                 <div class="form-group" style="flex: 0;">
                     <label style="visibility:hidden">Reset</label>
-                    <button type="button" class="btn-primary" id="btnAdvReset" style="padding: 12px 24px; font-size: 0.95rem; width: auto;">Zurücksetzen</button>
+                    <button type="button" class="btn-primary" id="btnAdvReset" data-i18n="advReset" style="padding: 12px 24px; font-size: 0.95rem; width: auto;">Zurücksetzen</button>
                 </div>
             </div>
 
             <!-- Budget-Chips -->
             <div class="adv-budget">
                 <div class="budget-chip">
-                    <div class="chip-label">HO-Budget</div>
+                    <div class="chip-label" data-i18n="advChipTotal">HO-Budget</div>
                     <div class="chip-value" id="advChipTotal">0</div>
                 </div>
                 <div class="budget-chip">
-                    <div class="chip-label">HO verplant</div>
+                    <div class="chip-label" data-i18n="advChipUsed">HO verplant</div>
                     <div class="chip-value" id="advChipUsed">0</div>
                 </div>
                 <div class="budget-chip" id="advChipRemCard">
-                    <div class="chip-label">HO verbleibend</div>
+                    <div class="chip-label" data-i18n="advChipRemaining">HO verbleibend</div>
                     <div class="chip-value" id="advChipRem">0</div>
                 </div>
                 <div class="budget-chip">
-                    <div class="chip-label">Urlaub verplant</div>
+                    <div class="chip-label" data-i18n="advChipVacation">Urlaub verplant</div>
                     <div class="chip-value" id="advChipVac">0</div>
                 </div>
             </div>
 
             <!-- Warnungen -->
-            <div class="adv-warning" id="advWarn">Achtung: Du hast 90% deines HO-Budgets verplant!</div>
-            <div class="adv-danger" id="advDanger">Zu viele Tage verplant! Du überschreitest dein Budget um <span id="advOver">0</span> Tage.</div>
+            <div class="adv-warning" id="advWarn" data-i18n="advWarning90">Achtung: Du hast 90% deines HO-Budgets verplant!</div>
+            <div class="adv-danger" id="advDanger"><span id="advDangerText">Zu viele Tage verplant! Du überschreitest dein Budget um 0 Tage.</span></div>
 
             <!-- Canvas Chart -->
             <div class="chart-wrapper">
@@ -318,23 +319,23 @@
         <span class="period-num"></span>
         <div class="period-quick"></div>
         <div class="form-group">
-          <label>Startdatum</label>
+          <label class="p-label-start">Startdatum</label>
           <input type="date" class="p-start" required>
         </div>
         <div class="form-group">
-          <label>Enddatum</label>
+          <label class="p-label-end">Enddatum</label>
           <input type="date" class="p-end" required>
         </div>
         <div class="form-group">
-          <label>HO-Tage</label>
+          <label class="p-label-ho">HO-Tage</label>
           <input type="number" class="p-ho" min="0" value="0">
         </div>
         <div class="form-group">
-          <label>Urlaubstage</label>
+          <label class="p-label-vac">Urlaubstage</label>
           <input type="number" class="p-vac" min="0" value="0">
         </div>
         <div class="form-group">
-          <label>Krankheitstage</label>
+          <label class="p-label-sick">Krankheitstage</label>
           <input type="number" class="p-sick" min="0" value="0">
         </div>
         <button type="button" class="btn-remove-period" title="Zeitraum entfernen">-</button>
@@ -344,13 +345,13 @@
     <template id="tmpl-month-card">
       <div class="month-card">
         <div class="month-name"></div>
-        <div class="month-type-label">HO-Tage</div>
+        <div class="month-type-label month-label-ho">HO-Tage</div>
         <div class="month-stepper">
           <button class="btn-step" data-type="ho" data-delta="-1">−</button>
           <div class="month-value" data-role="ho">0</div>
           <button class="btn-step" data-type="ho" data-delta="1">+</button>
         </div>
-        <div class="month-type-label">Urlaub</div>
+        <div class="month-type-label month-label-vac">Urlaub</div>
         <div class="month-stepper">
           <button class="btn-step" data-type="vac" data-delta="-1">−</button>
           <div class="month-value" data-role="vac">0</div>
@@ -360,6 +361,7 @@
       </div>
     </template>
 
+    <script src="js/i18n.js"></script>
     <script src="js/holidays.js"></script>
     <script src="js/app.js"></script>
     <script src="js/planner.js"></script>

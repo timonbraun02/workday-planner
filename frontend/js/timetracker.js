@@ -38,7 +38,7 @@ document.getElementById('timeForm').addEventListener('submit', (e) => {
     const netMinutes = grossMinutes - breakMin;
 
     if (netMinutes < 0) {
-        document.getElementById('timeError').textContent = 'Pause ist länger als die Arbeitszeit';
+        document.getElementById('timeError').textContent = t('breakTooLong');
         document.getElementById('timeError').classList.add('show');
         document.getElementById('timeWarning').classList.remove('show');
         document.getElementById('timeResults').classList.remove('show');
@@ -48,9 +48,9 @@ document.getElementById('timeForm').addEventListener('submit', (e) => {
     // ArbZG-Warnungen
     const warnings = [];
     if (grossMinutes > 9 * 60 && breakMin < 45)
-        warnings.push(`Achtung: Bei mehr als 9h Arbeitszeit schreibt das Arbeitszeitgesetz mindestens 45 Minuten Pause vor (eingetragen: ${breakMin} min).`);
+        warnings.push(t('warningBreak', breakMin));
     if (netMinutes > 10 * 60)
-        warnings.push(`Hinweis: Die Netto-Arbeitszeit überschreitet 10 Stunden- das ist nach ArbZG §3 nicht zulässig.`);
+        warnings.push(t('warningOvertime'));
 
     const warningDiv = document.getElementById('timeWarning');
     if (warnings.length > 0) {

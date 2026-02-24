@@ -6,6 +6,13 @@
 const MONTHS_DE = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
 const MONTHS_FULL = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
 
+function getMonthsShort() {
+    return (typeof t === 'function') ? t('monthsShort') : MONTHS_DE;
+}
+function getMonthsFull() {
+    return (typeof t === 'function') ? t('monthsFull') : MONTHS_FULL;
+}
+
 let advData = (() => {
     try {
         const saved = JSON.parse(localStorage.getItem('wp_adv'));
@@ -105,9 +112,11 @@ function advUpdateAll() {
     const dangerDiv = document.getElementById('advDanger');
     if (rem < 0) {
         dangerDiv.classList.add('show');
-        document.getElementById('advOver').textContent = Math.abs(rem);
+        const dangerText = document.getElementById('advDangerText');
+        if (dangerText) dangerText.textContent = t('advDangerOver', Math.abs(rem));
         warnDiv.classList.remove('show');
     } else if (pct >= 0.9 && pct < 1) {
+        warnDiv.textContent = t('advWarning90');
         warnDiv.classList.add('show');
         dangerDiv.classList.remove('show');
     } else {
@@ -128,7 +137,7 @@ function advUpdateAll() {
         hoEl.classList.toggle('over', total > workdays || (total > 0 && rem < 0));
         vacEl.classList.toggle('over', total > workdays || (total > 0 && rem < 0));
         // Arbeitstage im Monat berechnen für Hilfstext
-        subEl.textContent = `${total}/${workdays} Tage`;
+        subEl.textContent = t('advDaysOf', total, workdays);
     }
 
     // Chart neu zeichnen
@@ -159,11 +168,15 @@ function advBuildMonthCards() {
         const fragment = tmpl.content.cloneNode(true);
         const card = fragment.querySelector('.month-card');
         card.dataset.month = i;
-        card.querySelector('.month-name').textContent = MONTHS_FULL[i];
+        card.querySelector('.month-name').textContent = getMonthsFull()[i];
         card.querySelector('[data-role="ho"]').id  = `adv-ho-${i}`;
         card.querySelector('[data-role="vac"]').id = `adv-vac-${i}`;
         card.querySelector('.month-sub').id         = `adv-sub-${i}`;
         card.querySelectorAll('.btn-step').forEach(btn => btn.dataset.month = i);
+        // Translate month-type labels
+        const typeLabels = card.querySelectorAll('.month-type-label');
+        if (typeLabels[0]) typeLabels[0].textContent = t('advHoDays');
+        if (typeLabels[1]) typeLabels[1].textContent = t('advVacation');
         container.appendChild(fragment);
     }
 }
@@ -261,8 +274,9 @@ function advDrawChart() {
     ctx.fillStyle  = colorText;
     ctx.font       = '11px system-ui';
     ctx.textAlign  = 'center';
+    const monthsShort = getMonthsShort();
     for (let i = 0; i < 12; i++) {
-        ctx.fillText(MONTHS_DE[i], xPos(i), PAD_T + chartH + 18);
+        ctx.fillText(monthsShort[i], xPos(i), PAD_T + chartH + 18);
     }
 
     // Achsentitel
@@ -272,7 +286,7 @@ function advDrawChart() {
     ctx.fillStyle  = colorText;
     ctx.font       = 'bold 11px system-ui';
     ctx.textAlign  = 'center';
-    ctx.fillText('HO-Tage', 0, 0);
+    ctx.fillText(t('advHoDays'), 0, 0);
     ctx.restore();
 
     // Farben für HO und Urlaub
@@ -401,7 +415,7 @@ function advDrawChart() {
     ctx.fillStyle = colorText;
     ctx.font = '11px system-ui';
     ctx.textAlign = 'left';
-    ctx.fillText('HO-Tage', legX + 30, legY + 4);
+    ctx.fillText(t('advHoDays'), legX + 30, legY + 4);
     
     // Urlaub Legende
     ctx.beginPath();
@@ -417,7 +431,7 @@ function advDrawChart() {
     ctx.fillStyle = colorText;
     ctx.font = '11px system-ui';
     ctx.textAlign = 'left';
-    ctx.fillText('Urlaub', legX + 30, legY + 22);
+    ctx.fillText(t('advVacation'), legX + 30, legY + 22);
 }
 
 /* Catmull-Rom Spline Pfad */

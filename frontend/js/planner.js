@@ -6,6 +6,7 @@
 
 let periodCount = 0;
 let lastCalculatedHO = null;
+let lastCalculatedPeriods = null;
 
 function addPeriod(startVal, endVal, hoVal, vacVal, sickVal) {
     periodCount++;
@@ -14,13 +15,20 @@ function addPeriod(startVal, endVal, hoVal, vacVal, sickVal) {
     const fragment = tmpl.content.cloneNode(true);
     const item = fragment.querySelector('.period-item');
     item.id = `period-${id}`;
-    item.querySelector('.period-num').textContent = `Zeitraum ${id}`;
+    item.querySelector('.period-num').textContent = `${t('periodLabel')} ${id}`;
     item.querySelector('.btn-remove-period').dataset.periodId = id;
+    item.querySelector('.btn-remove-period').title = t('removePeriod');
     item.querySelector('.p-start').value = startVal || '';
     item.querySelector('.p-end').value   = endVal   || '';
     item.querySelector('.p-ho').value    = hoVal  != null ? hoVal  : 0;
     item.querySelector('.p-vac').value   = vacVal != null ? vacVal : 0;
     item.querySelector('.p-sick').value  = sickVal != null ? sickVal : 0;
+    // Translate labels in cloned template
+    item.querySelector('.p-label-start').textContent = t('startDate');
+    item.querySelector('.p-label-end').textContent   = t('endDate');
+    item.querySelector('.p-label-ho').textContent    = t('hoDays');
+    item.querySelector('.p-label-vac').textContent   = t('vacationDays');
+    item.querySelector('.p-label-sick').textContent  = t('sickDays');
     document.getElementById('periodList').appendChild(fragment);
     const liveItem = document.getElementById(`period-${id}`);
     buildPeriodQuickActions(liveItem, id);
@@ -56,12 +64,12 @@ function buildPeriodQuickActions(item, id) {
     const curQS = new Date(y, curQ * 3, 1).toISOString().split('T')[0];
     const curQE = new Date(y, curQ * 3 + 3, 0).toISOString().split('T')[0];
 
-    btn('Heute - Jahresende', el => set(el, now.toISOString().split('T')[0], `${y}-12-31`));
-    btn('Akt. Jahr',          el => set(el, `${y}-01-01`,   `${y}-12-31`));
-    btn('Nächstes Jahr',      el => set(el, `${y+1}-01-01`, `${y+1}-12-31`));
-    btn('H1 ' + y,            el => set(el, `${y}-01-01`,   `${y}-06-30`));
-    btn('H2 ' + y,            el => set(el, `${y}-07-01`,   `${y}-12-31`));
-    btn('Akt. Quartal',       el => set(el, curQS,           curQE));
+    btn(t('quickTodayToYearEnd'), el => set(el, now.toISOString().split('T')[0], `${y}-12-31`));
+    btn(t('quickCurrentYear'),    el => set(el, `${y}-01-01`,   `${y}-12-31`));
+    btn(t('quickNextYear'),       el => set(el, `${y+1}-01-01`, `${y+1}-12-31`));
+    btn(t('quickH1') + ' ' + y,   el => set(el, `${y}-01-01`,   `${y}-06-30`));
+    btn(t('quickH2') + ' ' + y,   el => set(el, `${y}-07-01`,   `${y}-12-31`));
+    btn(t('quickCurrentQuarter'), el => set(el, curQS,           curQE));
 }
 
 function removePeriod(id) {
@@ -75,7 +83,7 @@ function refreshPeriodNumbers() {
     const items = document.querySelectorAll('.period-item');
     items.forEach((item, i) => {
         const numEl = item.querySelector('.period-num');
-        if (numEl) numEl.textContent = `Zeitraum ${i + 1}`;
+        if (numEl) numEl.textContent = `${t('periodLabel')} ${i + 1}`;
         // Remove-Button nur ausblenden wenn nur noch 1 Zeitraum
         const removeBtn = item.querySelector('.btn-remove-period');
         if (removeBtn) removeBtn.style.display = items.length > 1 ? '' : 'none';
@@ -102,7 +110,7 @@ function calculateWorkdays(formData) {
     const start = new Date(formData.start_date + 'T00:00:00Z');
     const end = new Date(formData.end_date + 'T00:00:00Z');
 
-    if (start > end) throw new Error('Startdatum muss vor dem Enddatum liegen');
+    if (start > end) throw new Error(t('errorStartBeforeEnd'));
 
     const germanHolidays = getGermanHolidays(
         start.getUTCFullYear(), end.getUTCFullYear(), formData.bundesland || null
@@ -141,8 +149,8 @@ function calculateWorkdays(formData) {
     }
 
     const availableWorkdays = totalWorkdays - formData.vacation_days - formData.sick_days;
-    if (availableWorkdays < 0) throw new Error('Urlaub und Krankheitstage übersteigen die verfügbaren Arbeitstage');
-    if (formData.home_office_days > availableWorkdays) throw new Error('Home Office Tage können die verfügbaren Arbeitstage nicht überschreiten');
+    if (availableWorkdays < 0) throw new Error(t('errorVacSickExceed'));
+    if (formData.home_office_days > availableWorkdays) throw new Error(t('errorHOExceed'));
 
     const requiredOfficeDays = availableWorkdays - formData.home_office_days;
     const officePercentage = availableWorkdays > 0 ? requiredOfficeDays / availableWorkdays * 100 : 0;
@@ -179,7 +187,7 @@ document.getElementById('planForm').addEventListener('submit', (e) => {
             office_attendance_percentage: 0, work_weeks: 0
         };
         for (const p of periods) {
-            if (!p.start_date || !p.end_date) throw new Error('Bitte alle Zeiträume mit Start- und Enddatum befüllen');
+            if (!p.start_date || !p.end_date) throw new Error(t('errorFillDates'));
             const r = calculateWorkdays(p);
             combined.total_calendar_days   += r.total_calendar_days;
             combined.total_workdays        += r.total_workdays;
@@ -199,6 +207,7 @@ document.getElementById('planForm').addEventListener('submit', (e) => {
             : 0;
 
         displayResults(combined);
+        lastCalculatedPeriods = periods;
         renderBrueckentage(periods);
         hideError();
     } catch (error) {
@@ -213,7 +222,12 @@ function displayResults(data) {
     document.getElementById('weekendDays').textContent = data.weekend_days;
     document.getElementById('publicHolidays').textContent = data.public_holidays;
     document.getElementById('requiredOfficeDays').textContent = data.required_office_days;
-    document.getElementById('officePercentage').textContent = data.office_attendance_percentage.toFixed(1);
+
+    // Prozent-Text aktualisieren
+    const officePercentEl = document.getElementById('officePercentText');
+    if (officePercentEl) {
+        officePercentEl.innerHTML = t('officePercentText', `<strong id="officePercentage">${data.office_attendance_percentage.toFixed(1)}</strong>`);
+    }
 
     const weeks = data.total_calendar_days / 7;
     const months = data.total_calendar_days / 30.44;
@@ -255,7 +269,7 @@ function planerReset() {
     const details = document.getElementById('resultsDetails');
     const btnToggle = document.getElementById('btnDetailsToggle');
     if (details) details.classList.remove('open');
-    if (btnToggle) { btnToggle.classList.remove('open'); btnToggle.textContent = 'Details anzeigen'; }
+    if (btnToggle) { btnToggle.classList.remove('open'); btnToggle.textContent = t('showDetails'); }
     // Erweiterte Optionen zuklappen
     closeAdvancedOptions();
     // Default-Zeitraum erstellen
@@ -336,7 +350,7 @@ function openAdvancedOptions() {
     content.classList.add('open');
     btn.classList.add('open');
     const lbl = btn.querySelector('span');
-    if (lbl) lbl.textContent = 'Erweiterte Optionen ausblenden';
+    if (lbl) lbl.textContent = t('advancedOptionsHide');
 }
 
 function closeAdvancedOptions() {
@@ -346,7 +360,7 @@ function closeAdvancedOptions() {
     content.classList.remove('open');
     btn.classList.remove('open');
     const lbl = btn.querySelector('span');
-    if (lbl) lbl.textContent = 'Erweiterte Optionen';
+    if (lbl) lbl.textContent = t('advancedOptions');
 }
 
 // Event Listener – Erweiterte Optionen Toggle
@@ -368,7 +382,7 @@ document.getElementById('btnDetailsToggle').addEventListener('click', () => {
     const details = document.getElementById('resultsDetails');
     const isOpen  = details.classList.toggle('open');
     btn.classList.toggle('open', isOpen);
-    btn.textContent = isOpen ? 'Details ausblenden' : 'Details anzeigen';
+    btn.textContent = isOpen ? t('hideDetails') : t('showDetails');
     // Restore the ::after arrow (textContent wipes it, so use data-label pattern via class only)
     // The arrow is rendered via CSS ::after, so textContent replacement is fine
 });
