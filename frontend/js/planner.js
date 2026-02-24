@@ -22,14 +22,15 @@ function addPeriod(startVal, endVal, hoVal, vacVal, sickVal) {
     item.querySelector('.p-vac').value   = vacVal != null ? vacVal : 0;
     item.querySelector('.p-sick').value  = sickVal != null ? sickVal : 0;
     document.getElementById('periodList').appendChild(fragment);
+    const liveItem = document.getElementById(`period-${id}`);
+    buildPeriodQuickActions(liveItem, id);
     refreshPeriodNumbers();
     if (typeof savePlanerState === 'function') savePlanerState();
 }
 
-/* Berechnet sinnvolle Quick-Buttons abhängig von der Position des Zeitraums */
+/* Erzeugt die 6 einheitlichen Quick-Buttons fuer jeden Zeitraum */
 function buildPeriodQuickActions(item, id) {
     const bar = item.querySelector('.period-quick');
-    const idx = Array.from(document.querySelectorAll('.period-item')).indexOf(item);
     const now = new Date();
     const y   = now.getFullYear();
     const m   = now.getMonth();
@@ -50,43 +51,17 @@ function buildPeriodQuickActions(item, id) {
         el.querySelector('.p-end').value   = e;
     };
 
-    // Aktuellen Monat berechnen
-    const curMonStart = new Date(y, m, 1).toISOString().split('T')[0];
-    const curMonEnd   = new Date(y, m + 1, 0).toISOString().split('T')[0];
-    // Nächsten Monat berechnen
-    const nm = new Date(y, m + 1, 1);
-    const nmStart = nm.toISOString().split('T')[0];
-    const nmEnd   = new Date(nm.getFullYear(), nm.getMonth() + 1, 0).toISOString().split('T')[0];
-    // Quartale
+    // Aktuelles Quartal
     const curQ  = Math.floor(m / 3);
     const curQS = new Date(y, curQ * 3, 1).toISOString().split('T')[0];
     const curQE = new Date(y, curQ * 3 + 3, 0).toISOString().split('T')[0];
-    const nqRaw = curQ + 1;
-    const nqY   = y + Math.floor(nqRaw / 4);
-    const nqM   = (nqRaw % 4) * 3;
-    const nqS   = new Date(nqY, nqM, 1).toISOString().split('T')[0];
-    const nqE   = new Date(nqY, nqM + 3, 0).toISOString().split('T')[0];
 
-    if (idx === 0) {
-        // Erster Zeitraum: Jahres-Shortcuts
-        btn('Akt. Jahr',        el => set(el, `${y}-01-01`,    `${y}-12-31`));
-        btn('Heute - Jahresende', el => set(el, now.toISOString().split('T')[0], `${y}-12-31`));
-        btn('Nächstes Jahr',    el => set(el, `${y+1}-01-01`,  `${y+1}-12-31`));
-        btn('H1 ' + y,         el => set(el, `${y}-01-01`,    `${y}-06-30`));
-        btn('H2 ' + y,         el => set(el, `${y}-07-01`,    `${y}-12-31`));
-    } else {
-        // Weitere Zeiträume: kein Jahres-Shortcut, aber beide Jahre für Halbjahre
-        btn('H1 ' + y,         el => set(el, `${y}-01-01`,    `${y}-06-30`));
-        btn('H2 ' + y,         el => set(el, `${y}-07-01`,    `${y}-12-31`));
-        btn('H1 ' + (y+1),     el => set(el, `${y+1}-01-01`,  `${y+1}-06-30`));
-        btn('H2 ' + (y+1),     el => set(el, `${y+1}-07-01`,  `${y+1}-12-31`));
-    }
-
-    // Für alle Zeiträume: Monats- und Quartals-Shortcuts
-    btn('Akt. Monat',      el => set(el, curMonStart, curMonEnd));
-    btn('Nächster Monat',  el => set(el, nmStart,     nmEnd));
-    btn('Akt. Quartal',    el => set(el, curQS,       curQE));
-    btn('Nächstes Quartal',el => set(el, nqS,         nqE));
+    btn('Heute - Jahresende', el => set(el, now.toISOString().split('T')[0], `${y}-12-31`));
+    btn('Akt. Jahr',          el => set(el, `${y}-01-01`,   `${y}-12-31`));
+    btn('Nächstes Jahr',      el => set(el, `${y+1}-01-01`, `${y+1}-12-31`));
+    btn('H1 ' + y,            el => set(el, `${y}-01-01`,   `${y}-06-30`));
+    btn('H2 ' + y,            el => set(el, `${y}-07-01`,   `${y}-12-31`));
+    btn('Akt. Quartal',       el => set(el, curQS,           curQE));
 }
 
 function removePeriod(id) {
@@ -104,9 +79,6 @@ function refreshPeriodNumbers() {
         // Remove-Button nur ausblenden wenn nur noch 1 Zeitraum
         const removeBtn = item.querySelector('.btn-remove-period');
         if (removeBtn) removeBtn.style.display = items.length > 1 ? '' : 'none';
-        // Quick-Buttons neu bauen (Reihenfolge kann sich geändert haben)
-        const bar = item.querySelector('.period-quick');
-        if (bar) { bar.innerHTML = ''; buildPeriodQuickActions(item, parseInt(item.id.replace('period-',''))); }
     });
 }
 
