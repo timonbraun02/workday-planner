@@ -35,7 +35,7 @@ function addPeriod(startVal, endVal, hoVal, vacVal, sickVal) {
             <label>Krankheitstage</label>
             <input type="number" class="p-sick" min="0" value="${sickVal != null ? sickVal : 0}">
         </div>
-        <button type="button" class="btn-remove-period" onclick="removePeriod(${id})" title="Zeitraum entfernen">-</button>
+        <button type="button" class="btn-remove-period" data-period-id="${id}" title="Zeitraum entfernen">-</button>
     `;
     document.getElementById('periodList').appendChild(item);
     refreshPeriodNumbers();
@@ -345,8 +345,20 @@ document.getElementById('fourDayWeek').addEventListener('change', savePlanerStat
     periods.forEach(p => addPeriod(p.start, p.end, p.ho, p.vac, p.sick));
 })();
 
-// Globale Exposition
-window.addPeriod     = addPeriod;
-window.removePeriod  = removePeriod;
-window.planerReset   = planerReset;
-window.savePlanerState = savePlanerState;
+// Event Delegation – Zeitraum entfernen
+document.getElementById('periodList').addEventListener('click', (e) => {
+    const btn = e.target.closest('.btn-remove-period');
+    if (!btn) return;
+    const item = btn.closest('.period-item');
+    if (item) {
+        item.remove();
+        refreshPeriodNumbers();
+        if (typeof savePlanerState === 'function') savePlanerState();
+    }
+});
+
+// Event Listener – Zeitraum hinzufügen
+document.getElementById('btnAddPeriod').addEventListener('click', () => addPeriod());
+
+// Event Listener – Planer zurücksetzen
+document.getElementById('btnPlanerReset').addEventListener('click', planerReset);

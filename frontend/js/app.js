@@ -28,17 +28,22 @@ function getISOWeekKey(date) {
 }
 
 // Tab switching
-function switchTab(event, tabName) {
+function switchTab(btn, tabName) {
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('tab-' + tabName).classList.add('active');
-    event.currentTarget.classList.add('active');
+    btn.classList.add('active');
     if (tabName === 'advanced') {
         requestAnimationFrame(() => advDrawChart());
     }
 }
 
-// Globale Exposition
-window.toggleDarkMode = toggleDarkMode;
-window.getISOWeekKey  = getISOWeekKey;
-window.switchTab      = switchTab;
+// Event Listeners – Theme Toggle & Tab Navigation
+document.getElementById('themeBtn').addEventListener('click', toggleDarkMode);
+
+document.querySelector('.tab-nav').addEventListener('click', (e) => {
+    const btn = e.target.closest('.tab-btn');
+    if (!btn) return;
+    const tabName = btn.dataset.tab;
+    if (tabName) switchTab(btn, tabName);
+});

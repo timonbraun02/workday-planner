@@ -120,6 +120,8 @@ function zeitrechnerReset() {
 });
 
 // Globale Exposition
-window.setEndNow       = setEndNow;
 window.formatMinutes   = formatMinutes;
-window.zeitrechnerReset = zeitrechnerReset;
+
+// Event Listeners
+document.getElementById('btnSetEndNow').addEventListener('click', setEndNow);
+document.getElementById('btnZeitrechnerReset').addEventListener('click', zeitrechnerReset);

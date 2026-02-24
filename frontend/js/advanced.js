@@ -161,15 +161,15 @@ function advBuildMonthCards() {
             <div class="month-name">${MONTHS_FULL[i]}</div>
             <div class="month-type-label">HO-Tage</div>
             <div class="month-stepper">
-                <button class="btn-step" onclick="advChangeDay(${i}, 'ho', -1)">−</button>
+                <button class="btn-step" data-month="${i}" data-type="ho" data-delta="-1">−</button>
                 <div class="month-value" id="adv-ho-${i}">0</div>
-                <button class="btn-step" onclick="advChangeDay(${i}, 'ho', 1)">+</button>
+                <button class="btn-step" data-month="${i}" data-type="ho" data-delta="1">+</button>
             </div>
             <div class="month-type-label">Urlaub</div>
             <div class="month-stepper">
-                <button class="btn-step" onclick="advChangeDay(${i}, 'vac', -1)">−</button>
+                <button class="btn-step" data-month="${i}" data-type="vac" data-delta="-1">−</button>
                 <div class="month-value" id="adv-vac-${i}">0</div>
-                <button class="btn-step" onclick="advChangeDay(${i}, 'vac', 1)">+</button>
+                <button class="btn-step" data-month="${i}" data-type="vac" data-delta="1">+</button>
             </div>
             <div class="month-sub" id="adv-sub-${i}">0/– Tage</div>
         `;
@@ -647,8 +647,19 @@ window.addEventListener('resize', () => { if (document.getElementById('tab-advan
 advBuildMonthCards();
 advUpdateAll(); // Chips + Karten befüllen, aber Chart erst wenn sichtbar
 
-// Globale Exposition
-window.advReset     = advReset;
-window.advChangeDay = advChangeDay;
+// Event Delegation – Monats-Stepper
+document.getElementById('advMonthControls').addEventListener('click', (e) => {
+    const btn = e.target.closest('.btn-step');
+    if (!btn) return;
+    const monthIdx = parseInt(btn.dataset.month, 10);
+    const type     = btn.dataset.type;
+    const delta    = parseInt(btn.dataset.delta, 10);
+    advChangeDay(monthIdx, type, delta);
+});
+
+// Event Listener – Advanced Reset
+document.getElementById('btnAdvReset').addEventListener('click', advReset);
+
+// Globale Exposition (nur was von anderen Modulen benötigt wird)
 window.advUpdateAll = advUpdateAll;
 window.advDrawChart = advDrawChart;
