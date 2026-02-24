@@ -277,6 +277,11 @@ function planerReset() {
     document.getElementById('results').classList.remove('show');
     document.getElementById('error').classList.remove('show');
     document.getElementById('brueckentageSection').style.display = 'none';
+    // Details-Bereich zurücksetzen
+    const details = document.getElementById('resultsDetails');
+    const btnToggle = document.getElementById('btnDetailsToggle');
+    if (details) details.classList.remove('open');
+    if (btnToggle) { btnToggle.classList.remove('open'); btnToggle.textContent = 'Details anzeigen'; }
     // Default-Zeitraum erstellen
     const today = new Date().toISOString().split('T')[0];
     const yearEnd = `${new Date().getFullYear()}-12-31`;
@@ -345,3 +350,14 @@ document.getElementById('btnAddPeriod').addEventListener('click', () => addPerio
 
 // Event Listener – Planer zurücksetzen
 document.getElementById('btnPlanerReset').addEventListener('click', planerReset);
+
+// Event Listener – Details-Toggle
+document.getElementById('btnDetailsToggle').addEventListener('click', () => {
+    const btn     = document.getElementById('btnDetailsToggle');
+    const details = document.getElementById('resultsDetails');
+    const isOpen  = details.classList.toggle('open');
+    btn.classList.toggle('open', isOpen);
+    btn.textContent = isOpen ? 'Details ausblenden' : 'Details anzeigen';
+    // Restore the ::after arrow (textContent wipes it, so use data-label pattern via class only)
+    // The arrow is rendered via CSS ::after, so textContent replacement is fine
+});

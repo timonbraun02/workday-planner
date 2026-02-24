@@ -684,6 +684,54 @@ input[type="checkbox"] {
     color: white;
 }
 
+/* Details-Toggle */
+.btn-details-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+    padding: 6px 12px;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+}
+
+.btn-details-toggle:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+}
+
+.btn-details-toggle::after {
+    content: '▸';
+    display: inline-block;
+    transition: transform 0.25s ease;
+    font-size: 0.8rem;
+}
+
+.btn-details-toggle.open::after {
+    transform: rotate(90deg);
+}
+
+.results-details {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.35s ease, opacity 0.3s ease;
+    opacity: 0;
+}
+
+.results-details.open {
+    max-height: 600px;
+    opacity: 1;
+}
+
+.results-details .stats-grid {
+    margin-top: 12px;
+}
+
 /* Brückentage */
 .brueckentage-section {
     margin-top: 20px;

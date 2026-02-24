@@ -76,36 +76,6 @@
 
             <div id="results" class="results">
                 <h2>Ergebnis</h2>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-label">Kalendertage</div>
-                        <div class="stat-value">
-                            <span id="totalCalendarDays">0</span>
-                            <span class="stat-unit">Tage</span>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Arbeitstage gesamt</div>
-                        <div class="stat-value">
-                            <span id="totalWorkdays">0</span>
-                            <span class="stat-unit">Tage</span>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Wochenendtage</div>
-                        <div class="stat-value">
-                            <span id="weekendDays">0</span>
-                            <span class="stat-unit">Tage</span>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Feiertage</div>
-                        <div class="stat-value">
-                            <span id="publicHolidays">0</span>
-                            <span class="stat-unit">Tage</span>
-                        </div>
-                    </div>
-                </div>
 
                 <div class="highlight-card">
                     <h3>Erforderliche Bürotage</h3>
@@ -134,20 +104,55 @@
                     </div>
                 </div>
 
-                <!-- Wochenplanung -->
-                <div class="stats-grid" style="margin-top: 10px;" id="weekPlanSection">
-                    <div class="stat-card">
-                        <div class="stat-label">Wochen im Zeitraum</div>
-                        <div class="stat-value">
-                            <span id="totalWeeks">0</span>
-                            <span class="stat-unit">Wochen</span>
+                <button type="button" class="btn-details-toggle" id="btnDetailsToggle">Details anzeigen</button>
+
+                <div class="results-details" id="resultsDetails">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Kalendertage</div>
+                            <div class="stat-value">
+                                <span id="totalCalendarDays">0</span>
+                                <span class="stat-unit">Tage</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Arbeitstage gesamt</div>
+                            <div class="stat-value">
+                                <span id="totalWorkdays">0</span>
+                                <span class="stat-unit">Tage</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Wochenendtage</div>
+                            <div class="stat-value">
+                                <span id="weekendDays">0</span>
+                                <span class="stat-unit">Tage</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Feiertage</div>
+                            <div class="stat-value">
+                                <span id="publicHolidays">0</span>
+                                <span class="stat-unit">Tage</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Wochen mit 2× Büro</div>
-                        <div class="stat-value">
-                            <span id="weeksWithDouble">0</span>
-                            <span class="stat-unit">Wochen</span>
+
+                    <!-- Wochenplanung -->
+                    <div class="stats-grid" id="weekPlanSection">
+                        <div class="stat-card">
+                            <div class="stat-label">Wochen im Zeitraum</div>
+                            <div class="stat-value">
+                                <span id="totalWeeks">0</span>
+                                <span class="stat-unit">Wochen</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Wochen mit 2× Büro</div>
+                            <div class="stat-value">
+                                <span id="weeksWithDouble">0</span>
+                                <span class="stat-unit">Wochen</span>
+                            </div>
                         </div>
                     </div>
                 </div>
