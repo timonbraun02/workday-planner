@@ -6,6 +6,7 @@
 
 let periodCount = 0;
 let lastCalculatedHO = null;
+let lastCalculatedVac = null;
 let lastCalculatedPeriods = null;
 
 function addPeriod(startVal, endVal, hoVal, vacVal, sickVal) {
@@ -216,7 +217,8 @@ document.getElementById('planForm').addEventListener('submit', (e) => {
 });
 
 function displayResults(data) {
-    lastCalculatedHO = data.home_office_days;
+    lastCalculatedHO  = data.home_office_days;
+    lastCalculatedVac = data.vacation_days;
     document.getElementById('totalCalendarDays').textContent = data.total_calendar_days;
     document.getElementById('totalWorkdays').textContent = data.total_workdays;
     document.getElementById('weekendDays').textContent = data.weekend_days;
@@ -391,6 +393,13 @@ document.getElementById('btnDetailsToggle').addEventListener('click', () => {
 document.getElementById('btnTransferBudget').addEventListener('click', () => {
     if (lastCalculatedHO === null) return;
     document.getElementById('advBudget').value = lastCalculatedHO;
+    // Urlaubsbudget übertragen: berechnete Urlaubstage oder Default 30
+    const vacBudgetEl = document.getElementById('advVacBudget');
+    if (vacBudgetEl) {
+        vacBudgetEl.value = (lastCalculatedVac !== null && lastCalculatedVac > 0)
+            ? lastCalculatedVac
+            : 30;
+    }
     if (typeof advUpdateAll === 'function') advUpdateAll();
     const advBtn = document.querySelector('.tab-btn[data-tab="advanced"]');
     if (advBtn && typeof switchTab === 'function') switchTab(advBtn, 'advanced');

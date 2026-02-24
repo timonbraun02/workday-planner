@@ -18,8 +18,9 @@ let advData = (() => {
         const saved = JSON.parse(localStorage.getItem('wp_adv'));
         if (saved && Array.isArray(saved.hoDays) && saved.hoDays.length === 12) {
             // Gespeicherte Werte in die Inputs übertragen
-            if (saved.budget != null) document.getElementById('advBudget').value = saved.budget;
-            if (saved.year   != null) document.getElementById('advYear').value   = saved.year;
+            if (saved.budget    != null) document.getElementById('advBudget').value    = saved.budget;
+            if (saved.year      != null) document.getElementById('advYear').value      = saved.year;
+            if (saved.vacBudget != null) document.getElementById('advVacBudget').value = saved.vacBudget;
             return { 
                 budget: saved.budget, 
                 year: saved.year, 
@@ -44,25 +45,28 @@ let advData = (() => {
 
 function saveAdvState() {
     localStorage.setItem('wp_adv', JSON.stringify({
-        budget: advGetBudget(),
-        year:   advGetYear(),
-        hoDays: advData.hoDays,
-        vacDays: advData.vacDays
+        budget:    advGetBudget(),
+        year:      advGetYear(),
+        vacBudget: advGetVacBudget(),
+        hoDays:    advData.hoDays,
+        vacDays:   advData.vacDays
     }));
 }
 
-function advGetBudget()  { return parseInt(document.getElementById('advBudget').value) || 0; }
-function advGetYear()    { return parseInt(document.getElementById('advYear').value) || new Date().getFullYear(); }
-function advGetUsedHO()  { return advData.hoDays.reduce((a, b) => a + b, 0); }
-function advGetUsedVac() { return advData.vacDays.reduce((a, b) => a + b, 0); }
+function advGetBudget()     { return parseInt(document.getElementById('advBudget').value) || 0; }
+function advGetVacBudget()  { return parseInt(document.getElementById('advVacBudget').value) || 30; }
+function advGetYear()       { return parseInt(document.getElementById('advYear').value) || new Date().getFullYear(); }
+function advGetUsedHO()     { return advData.hoDays.reduce((a, b) => a + b, 0); }
+function advGetUsedVac()    { return advData.vacDays.reduce((a, b) => a + b, 0); }
 // Budget bezieht sich nur auf HO-Tage; Urlaub wird separat angezeigt
 function advGetUsed()    { return advGetUsedHO(); }
 function advGetRem()     { return advGetBudget() - advGetUsed(); }
 
 function advReset() {
-    document.getElementById('advBudget').value = 130;
-    document.getElementById('advYear').value   = new Date().getFullYear();
-    advData.hoDays = new Array(12).fill(0);
+    document.getElementById('advBudget').value    = 130;
+    document.getElementById('advVacBudget').value = 30;
+    document.getElementById('advYear').value      = new Date().getFullYear();
+    advData.hoDays  = new Array(12).fill(0);
     advData.vacDays = new Array(12).fill(0);
     localStorage.removeItem('wp_adv');
     advUpdateAll();
@@ -88,11 +92,12 @@ function advChangeDay(monthIdx, type, delta) {
 }
 
 function advUpdateAll() {
-    const budget  = advGetBudget();
-    const usedHO  = advGetUsedHO();
-    const usedVac = advGetUsedVac();
-    const rem     = budget - usedHO;
-    const pct     = budget > 0 ? usedHO / budget : 0;
+    const budget   = advGetBudget();
+    const vacBudget = advGetVacBudget();
+    const usedHO   = advGetUsedHO();
+    const usedVac  = advGetUsedVac();
+    const rem      = budget - usedHO;
+    const pct      = budget > 0 ? usedHO / budget : 0;
 
     // Chips: HO-Budget getrennt von Urlaub
     document.getElementById('advChipTotal').textContent = budget;
@@ -107,7 +112,7 @@ function advUpdateAll() {
     if (rem < 0)           remCard.classList.add('danger');
     else if (pct >= 0.9)   remCard.classList.add('warning');
 
-    // Warnungen
+    // HO-Warnungen
     const warnDiv   = document.getElementById('advWarn');
     const dangerDiv = document.getElementById('advDanger');
     if (rem < 0) {
@@ -122,6 +127,18 @@ function advUpdateAll() {
     } else {
         warnDiv.classList.remove('show');
         dangerDiv.classList.remove('show');
+    }
+
+    // Urlaubs-Warnung
+    const vacDangerDiv  = document.getElementById('advVacDanger');
+    const vacDangerText = document.getElementById('advVacDangerText');
+    if (vacDangerDiv) {
+        if (usedVac > vacBudget) {
+            if (vacDangerText) vacDangerText.textContent = t('advVacDangerOver', usedVac - vacBudget);
+            vacDangerDiv.classList.add('show');
+        } else {
+            vacDangerDiv.classList.remove('show');
+        }
     }
 
     // Monats-Cards aktualisieren
@@ -462,6 +479,7 @@ function advNiceStep(maxVal) {
 
 /* Event-Listener */
 document.getElementById('advBudget').addEventListener('input', advUpdateAll);
+document.getElementById('advVacBudget').addEventListener('input', advUpdateAll);
 document.getElementById('advYear').addEventListener('input', advUpdateAll);
 window.addEventListener('resize', () => { if (document.getElementById('tab-advanced').classList.contains('active')) advDrawChart(); });
 

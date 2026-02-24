@@ -273,6 +273,10 @@
                     <label for="advBudget" data-i18n="advBudget">Verfügbare HO-Tage (Jahresbudget)</label>
                     <input type="number" id="advBudget" min="0" max="365" value="130">
                 </div>
+                <div class="form-group">
+                    <label for="advVacBudget" data-i18n="advVacBudget">Verfügbarer Urlaub (Jahresbudget)</label>
+                    <input type="number" id="advVacBudget" min="0" max="365" value="30">
+                </div>
                 <div class="form-group" style="flex: 0;">
                     <label style="visibility:hidden">Reset</label>
                     <button type="button" class="btn-primary" id="btnAdvReset" data-i18n="advReset" style="padding: 12px 24px; font-size: 0.95rem; width: auto;">Zurücksetzen</button>
@@ -302,6 +306,7 @@
             <!-- Warnungen -->
             <div class="adv-warning" id="advWarn" data-i18n="advWarning90">Achtung: Du hast 90% deines HO-Budgets verplant!</div>
             <div class="adv-danger" id="advDanger"><span id="advDangerText">Zu viele Tage verplant! Du überschreitest dein Budget um 0 Tage.</span></div>
+            <div class="adv-danger" id="advVacDanger"><span id="advVacDangerText">Zu viele Urlaubstage verplant!</span></div>
 
             <!-- Canvas Chart -->
             <div class="chart-wrapper">
