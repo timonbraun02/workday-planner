@@ -694,7 +694,11 @@ function savePlanerState() {
 
 // Planer-State bei jeder Änderung speichern
 document.getElementById('periodList').addEventListener('input', savePlanerState);
-document.getElementById('bundesland').addEventListener('change', savePlanerState);
+document.getElementById('bundesland').addEventListener('change', () => {
+    savePlanerState();
+    // Advanced Tab: Arbeitstage pro Monat neu berechnen wenn Bundesland geändert
+    advUpdateAll();
+});
 document.getElementById('fourDayWeek').addEventListener('change', savePlanerState);
 
 /* =========================================================
@@ -864,11 +868,16 @@ function advUpdateAll() {
 }
 
 function advWorkdaysInMonth(year, monthIdx) {
+    const bl = document.getElementById('bundesland').value || null;
+    const firstDay = new Date(Date.UTC(year, monthIdx, 1));
+    const lastDay  = new Date(Date.UTC(year, monthIdx + 1, 0));
+    const holidays = getGermanHolidays(year, year, bl);
     let count = 0;
-    const daysInMonth = new Date(year, monthIdx + 1, 0).getDate();
+    const daysInMonth = lastDay.getUTCDate();
     for (let d = 1; d <= daysInMonth; d++) {
-        const dow = new Date(year, monthIdx, d).getDay();
-        if (dow !== 0 && dow !== 6) count++;
+        const dow     = new Date(Date.UTC(year, monthIdx, d)).getUTCDay();
+        const dateStr = `${year}-${String(monthIdx + 1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        if (dow !== 0 && dow !== 6 && !holidays.has(dateStr)) count++;
     }
     return count;
 }
