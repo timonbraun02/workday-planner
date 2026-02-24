@@ -54,65 +54,43 @@ function getBussUndBettag(year) {
     return d.toISOString().substring(0, 10);
 }
 
+// Zentrale Feiertagsdefinition – Single Source of Truth
+// states: null = bundesweit, Array = nur diese Bundesländer
+// from:   optionales Startjahr (inklusiv)
+const GERMAN_HOLIDAYS = [
+    { date: (y, e) => fixed(y, 1, 1),          name: 'Neujahr',                     states: null },
+    { date: (y, e) => easterPlus(e, -2),        name: 'Karfreitag',                  states: null },
+    { date: (y, e) => easterPlus(e, 0),         name: 'Ostersonntag',                states: ['BB'] },
+    { date: (y, e) => easterPlus(e, 1),         name: 'Ostermontag',                 states: null },
+    { date: (y, e) => fixed(y, 5, 1),           name: 'Tag der Arbeit',              states: null },
+    { date: (y, e) => easterPlus(e, 39),        name: 'Christi Himmelfahrt',         states: null },
+    { date: (y, e) => easterPlus(e, 49),        name: 'Pfingstsonntag',              states: ['BB'] },
+    { date: (y, e) => easterPlus(e, 50),        name: 'Pfingstmontag',               states: null },
+    { date: (y, e) => easterPlus(e, 60),        name: 'Fronleichnam',                states: ['BW','BY','HE','NW','RP','SL'] },
+    { date: (y, e) => fixed(y, 8, 15),          name: 'Mariä Himmelfahrt',           states: ['BY','SL'] },
+    { date: (y, e) => fixed(y, 9, 20),          name: 'Weltkindertag',               states: ['TH'], from: 2019 },
+    { date: (y, e) => fixed(y, 10, 3),          name: 'Tag der Deutschen Einheit',   states: null },
+    { date: (y, e) => fixed(y, 10, 31),         name: 'Reformationstag',             states: ['BB','HB','HH','MV','NI','SN','ST','SH','TH'] },
+    { date: (y, e) => fixed(y, 11, 1),          name: 'Allerheiligen',               states: ['BW','BY','NW','RP','SL'] },
+    { date: (y, e) => getBussUndBettag(y),      name: 'Buß- und Bettag',            states: ['SN'] },
+    { date: (y, e) => fixed(y, 12, 25),         name: '1. Weihnachtstag',            states: null },
+    { date: (y, e) => fixed(y, 12, 26),         name: '2. Weihnachtstag',            states: null },
+    { date: (y, e) => fixed(y, 1, 6),           name: 'Heilige Drei Könige',         states: ['BW','BY','ST'] },
+    { date: (y, e) => fixed(y, 3, 8),           name: 'Internationaler Frauentag',   states: ['BE','MV'] },
+];
+
 function getGermanHolidays(startYear, endYear, bundesland) {
     const set = new Set();
-    const bl = bundesland ? bundesland.toUpperCase() : null;
-
+    const bl  = bundesland ? bundesland.toUpperCase() : null;
     for (let y = startYear; y <= endYear; y++) {
         const e = getEaster(y);
-
-        // Bundesweite Feiertage
-        set.add(fixed(y, 1, 1));          // Neujahr
-        set.add(easterPlus(e, -2));        // Karfreitag
-        set.add(easterPlus(e, 1));         // Ostermontag
-        set.add(fixed(y, 5, 1));           // Tag der Arbeit
-        set.add(easterPlus(e, 39));        // Christi Himmelfahrt
-        set.add(easterPlus(e, 50));        // Pfingstmontag
-        set.add(fixed(y, 10, 3));          // Tag der Deutschen Einheit
-        set.add(fixed(y, 12, 25));         // 1. Weihnachtstag
-        set.add(fixed(y, 12, 26));         // 2. Weihnachtstag
-
-        if (!bl) continue;
-
-        // Heilige Drei Könige (6. Jan)
-        if (['BW','BY','ST'].includes(bl))
-            set.add(fixed(y, 1, 6));
-
-        // Internationaler Frauentag (8. März)
-        if (['BE','MV'].includes(bl))
-            set.add(fixed(y, 3, 8));
-
-        // Ostersonntag
-        if (bl === 'BB')
-            set.add(easterPlus(e, 0));
-
-        // Pfingstsonntag
-        if (bl === 'BB')
-            set.add(easterPlus(e, 49));
-
-        // Fronleichnam (Ostern +60)
-        if (['BW','BY','HE','NW','RP','SL'].includes(bl))
-            set.add(easterPlus(e, 60));
-
-        // Mariae Himmelfahrt (15. Aug)
-        if (['BY','SL'].includes(bl))
-            set.add(fixed(y, 8, 15));
-
-        // Weltkindertag (20. Sep) - TH seit 2019
-        if (bl === 'TH' && y >= 2019)
-            set.add(fixed(y, 9, 20));
-
-        // Reformationstag (31. Okt)
-        if (['BB','HB','HH','MV','NI','SN','ST','SH','TH'].includes(bl))
-            set.add(fixed(y, 10, 31));
-
-        // Allerheiligen (1. Nov)
-        if (['BW','BY','NW','RP','SL'].includes(bl))
-            set.add(fixed(y, 11, 1));
-
-        // Buß- und Bettag (Mittwoch vor 23. Nov)
-        if (bl === 'SN')
-            set.add(getBussUndBettag(y));
+        for (const h of GERMAN_HOLIDAYS) {
+            // Bundesland-Filter
+            if (h.states !== null && (!bl || !h.states.includes(bl))) continue;
+            // Jahr-Filter (z. B. Weltkindertag ab 2019)
+            if (h.from !== undefined && y < h.from) continue;
+            set.add(h.date(y, e));
+        }
     }
     return set;
 }
@@ -390,7 +368,7 @@ function findBrueckentage(startDateStr, endDateStr, bundesland) {
     return results.sort((a, b) => a.urlaubstag.localeCompare(b.urlaubstag));
 }
 
-// Feiertags-Namen-Lookup (lazy per Jahr)
+// Feiertags-Namen-Lookup (lazy per Jahr) -- nutzt GERMAN_HOLIDAYS als Single Source of Truth
 const _holidayNameCache = {};
 function buildHolidayNames(year, bundesland) {
     const key = `${year}-${bundesland || ''}`;
@@ -398,27 +376,13 @@ function buildHolidayNames(year, bundesland) {
     const bl = bundesland ? bundesland.toUpperCase() : null;
     const e  = getEaster(year);
     const map = {};
-    const add = (dateStr, name) => { if (!map[dateStr]) map[dateStr] = name; };
-    add(fixed(year,1,1),       'Neujahr');
-    add(easterPlus(e,-2),      'Karfreitag');
-    add(easterPlus(e,0),       'Ostersonntag');
-    add(easterPlus(e,1),       'Ostermontag');
-    add(fixed(year,5,1),       'Tag der Arbeit');
-    add(easterPlus(e,39),      'Christi Himmelfahrt');
-    add(easterPlus(e,49),      'Pfingstsonntag');
-    add(easterPlus(e,50),      'Pfingstmontag');
-    add(easterPlus(e,60),      'Fronleichnam');
-    add(fixed(year,10,3),      'Tag der Deutschen Einheit');
-    add(fixed(year,12,25),     '1. Weihnachtstag');
-    add(fixed(year,12,26),     '2. Weihnachtstag');
-    if (bl) {
-        add(fixed(year,1,6),   'Heilige Drei Könige');
-        add(fixed(year,3,8),   'Internationaler Frauentag');
-        add(fixed(year,8,15),  'Mariä Himmelfahrt');
-        add(fixed(year,9,20),  'Weltkindertag');
-        add(fixed(year,10,31), 'Reformationstag');
-        add(fixed(year,11,1),  'Allerheiligen');
-        add(getBussUndBettag(year), 'Buß- und Bettag');
+    for (const h of GERMAN_HOLIDAYS) {
+        // Alle bundesweiten + alle die fuer dieses Bundesland gelten in die Map aufnehmen
+        // (Namen werden fuer Anzeige gebraucht, auch wenn man kein BL gewählt hat)
+        if (h.states !== null && (!bl || !h.states.includes(bl))) continue;
+        if (h.from !== undefined && year < h.from) continue;
+        const dateStr = h.date(year, e);
+        if (!map[dateStr]) map[dateStr] = h.name;
     }
     _holidayNameCache[key] = map;
     return map;
