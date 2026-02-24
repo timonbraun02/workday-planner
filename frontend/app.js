@@ -178,6 +178,7 @@ function calculateWorkdays(formData) {
         custom_closed_days: customClosedCount,
         four_day_week_off_days: fourDayWeekOffDays,
         office_attendance_percentage: Math.round(officePercentage * 100) / 100,
+        work_weeks: Object.keys(workdaysPerWeek).length,
     };
 }
 
@@ -595,7 +596,7 @@ document.getElementById('planForm').addEventListener('submit', (e) => {
             vacation_days: 0, sick_days: 0,
             weekend_days: 0, public_holidays: 0,
             custom_closed_days: 0, four_day_week_off_days: 0,
-            office_attendance_percentage: 0
+            office_attendance_percentage: 0, work_weeks: 0
         };
         for (const p of periods) {
             if (!p.start_date || !p.end_date) throw new Error('Bitte alle Zeiträume mit Start- und Enddatum befüllen');
@@ -610,6 +611,7 @@ document.getElementById('planForm').addEventListener('submit', (e) => {
             combined.public_holidays       += r.public_holidays;
             combined.custom_closed_days    += r.custom_closed_days;
             combined.four_day_week_off_days+= r.four_day_week_off_days;
+            combined.work_weeks            += r.work_weeks;
         }
         const availTotal = combined.total_workdays - combined.vacation_days - combined.sick_days;
         combined.office_attendance_percentage = availTotal > 0
@@ -636,6 +638,11 @@ function displayResults(data) {
     const months = data.total_calendar_days / 30.44;
     document.getElementById('officeDaysPerWeek').textContent = weeks > 0 ? (data.required_office_days / weeks).toFixed(1) : '0';
     document.getElementById('officeDaysPerMonth').textContent = months > 0 ? (data.required_office_days / months).toFixed(1) : '0';
+
+    const totalWorkWeeks = data.work_weeks || 0;
+    const weeksWithDouble = Math.min(totalWorkWeeks, Math.max(0, data.required_office_days - totalWorkWeeks));
+    document.getElementById('totalWeeks').textContent = totalWorkWeeks;
+    document.getElementById('weeksWithDouble').textContent = weeksWithDouble;
 
     document.getElementById('results').classList.add('show');
 }
