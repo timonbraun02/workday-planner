@@ -499,13 +499,11 @@ document.getElementById('timeForm').addEventListener('submit', (e) => {
     const [eh, em] = end.split(':').map(Number);
 
     const startMinutes = sh * 60 + sm;
-    const endMinutes = eh * 60 + em;
+    let endMinutes = eh * 60 + em;
 
+    // Mitternachtsüberschreitung: z. B. 22:00 – 02:00
     if (endMinutes <= startMinutes) {
-        document.getElementById('timeError').textContent = 'Arbeitsende muss nach Arbeitsbeginn liegen';
-        document.getElementById('timeError').classList.add('show');
-        document.getElementById('timeResults').classList.remove('show');
-        return;
+        endMinutes += 24 * 60;
     }
 
     const grossMinutes = endMinutes - startMinutes;
@@ -747,7 +745,8 @@ function advGetBudget()  { return parseInt(document.getElementById('advBudget').
 function advGetYear()    { return parseInt(document.getElementById('advYear').value) || new Date().getFullYear(); }
 function advGetUsedHO()  { return advData.hoDays.reduce((a, b) => a + b, 0); }
 function advGetUsedVac() { return advData.vacDays.reduce((a, b) => a + b, 0); }
-function advGetUsed()    { return advGetUsedHO() + advGetUsedVac(); }
+// Budget bezieht sich nur auf HO-Tage; Urlaub wird separat angezeigt
+function advGetUsed()    { return advGetUsedHO(); }
 function advGetRem()     { return advGetBudget() - advGetUsed(); }
 
 function advReset() {
@@ -809,15 +808,19 @@ function advChangeDay(monthIdx, type, delta) {
 }
 
 function advUpdateAll() {
-    const budget = advGetBudget();
-    const used   = advGetUsed();
-    const rem    = budget - used;
-    const pct    = budget > 0 ? used / budget : 0;
+    const budget  = advGetBudget();
+    const usedHO  = advGetUsedHO();
+    const usedVac = advGetUsedVac();
+    const rem     = budget - usedHO;
+    const pct     = budget > 0 ? usedHO / budget : 0;
 
-    // Chips
+    // Chips: HO-Budget getrennt von Urlaub
     document.getElementById('advChipTotal').textContent = budget;
-    document.getElementById('advChipUsed').textContent  = used;
+    document.getElementById('advChipUsed').textContent  = usedHO;
     document.getElementById('advChipRem').textContent   = rem;
+    // Urlaubs-Chip (falls vorhanden)
+    const vacChip = document.getElementById('advChipVac');
+    if (vacChip) vacChip.textContent = usedVac;
 
     const remCard = document.getElementById('advChipRemCard');
     remCard.classList.remove('warning','danger');
