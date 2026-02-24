@@ -716,6 +716,38 @@ input[type="checkbox"] {
     transform: rotate(90deg);
 }
 
+/* Transfer-Button (Tab 1 → Monatsplanung) */
+.btn-transfer {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 14px;
+    padding: 8px 16px;
+    background: transparent;
+    border: 2px solid var(--accent);
+    border-radius: 8px;
+    color: var(--accent);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+.btn-transfer::before {
+    content: '→';
+    font-size: 1rem;
+}
+
+.btn-transfer:hover {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.35);
+}
+
+.btn-transfer:active {
+    transform: translateY(1px);
+}
+
 .results-details {
     overflow: hidden;
     max-height: 0;

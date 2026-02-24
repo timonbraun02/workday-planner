@@ -5,6 +5,7 @@
    ========================================================= */
 
 let periodCount = 0;
+let lastCalculatedHO = null;
 
 function addPeriod(startVal, endVal, hoVal, vacVal, sickVal) {
     periodCount++;
@@ -234,6 +235,7 @@ document.getElementById('planForm').addEventListener('submit', (e) => {
 });
 
 function displayResults(data) {
+    lastCalculatedHO = data.home_office_days;
     document.getElementById('totalCalendarDays').textContent = data.total_calendar_days;
     document.getElementById('totalWorkdays').textContent = data.total_workdays;
     document.getElementById('weekendDays').textContent = data.weekend_days;
@@ -360,4 +362,13 @@ document.getElementById('btnDetailsToggle').addEventListener('click', () => {
     btn.textContent = isOpen ? 'Details ausblenden' : 'Details anzeigen';
     // Restore the ::after arrow (textContent wipes it, so use data-label pattern via class only)
     // The arrow is rendered via CSS ::after, so textContent replacement is fine
+});
+
+// Event Listener – HO-Tage in Monatsplanung übertragen
+document.getElementById('btnTransferBudget').addEventListener('click', () => {
+    if (lastCalculatedHO === null) return;
+    document.getElementById('advBudget').value = lastCalculatedHO;
+    if (typeof advUpdateAll === 'function') advUpdateAll();
+    const advBtn = document.querySelector('.tab-btn[data-tab="advanced"]');
+    if (advBtn && typeof switchTab === 'function') switchTab(advBtn, 'advanced');
 });

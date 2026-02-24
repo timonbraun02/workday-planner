@@ -17,7 +17,7 @@
         <div class="tab-nav">
             <button class="tab-btn active" data-tab="planer">HO-Planer</button>
             <button class="tab-btn" data-tab="zeitrechner">Arbeitszeitrechner</button>
-            <button class="tab-btn" data-tab="advanced">Advanced HO Planer</button>
+            <button class="tab-btn" data-tab="advanced">Monatsplanung</button>
         </div>
 
         <div id="tab-planer" class="tab-content active">
@@ -103,6 +103,10 @@
                         </div>
                     </div>
                 </div>
+
+                <button type="button" class="btn-transfer" id="btnTransferBudget">
+                    HO-Tage in Monatsplanung übernehmen
+                </button>
 
                 <button type="button" class="btn-details-toggle" id="btnDetailsToggle">Details anzeigen</button>
 
@@ -241,9 +245,9 @@
         <div id="tab-advanced" class="tab-content">
         <div class="content">
             <div class="form-section">
-                <h2>Advanced HO Day Planer</h2>
+                <h2>Monatsplanung</h2>
                 <p style="color: var(--text-muted); margin-bottom: 8px; font-size: 0.95rem;">
-                    Verplane deine HO-Tage grafisch auf die Monate. Gib dein Jahresbudget ein und verteile die Tage mit den Reglern.
+                    Verteile deine HO- und Urlaubstage auf die einzelnen Monate des Jahres.
                 </p>
                 <p style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 18px;">
                     ℹ️ Feiertage werden anhand des Bundeslandes aus dem <strong>HO-Planer</strong> (Tab 1) berechnet.
