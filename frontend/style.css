@@ -631,6 +631,14 @@ body.dark .month-card .month-value.over {
     border-radius: 20px;
 }
 
+.period-quick {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 4px;
+}
+
 .period-item .form-group {
     flex: 1;
     min-width: 140px;

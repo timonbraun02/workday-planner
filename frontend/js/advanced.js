@@ -154,26 +154,17 @@ function advWorkdaysInMonth(year, monthIdx) {
 function advBuildMonthCards() {
     const container = document.getElementById('advMonthControls');
     container.innerHTML = '';
+    const tmpl = document.getElementById('tmpl-month-card');
     for (let i = 0; i < 12; i++) {
-        const card = document.createElement('div');
-        card.className = 'month-card';
-        card.innerHTML = `
-            <div class="month-name">${MONTHS_FULL[i]}</div>
-            <div class="month-type-label">HO-Tage</div>
-            <div class="month-stepper">
-                <button class="btn-step" data-month="${i}" data-type="ho" data-delta="-1">−</button>
-                <div class="month-value" id="adv-ho-${i}">0</div>
-                <button class="btn-step" data-month="${i}" data-type="ho" data-delta="1">+</button>
-            </div>
-            <div class="month-type-label">Urlaub</div>
-            <div class="month-stepper">
-                <button class="btn-step" data-month="${i}" data-type="vac" data-delta="-1">−</button>
-                <div class="month-value" id="adv-vac-${i}">0</div>
-                <button class="btn-step" data-month="${i}" data-type="vac" data-delta="1">+</button>
-            </div>
-            <div class="month-sub" id="adv-sub-${i}">0/– Tage</div>
-        `;
-        container.appendChild(card);
+        const fragment = tmpl.content.cloneNode(true);
+        const card = fragment.querySelector('.month-card');
+        card.dataset.month = i;
+        card.querySelector('.month-name').textContent = MONTHS_FULL[i];
+        card.querySelector('[data-role="ho"]').id  = `adv-ho-${i}`;
+        card.querySelector('[data-role="vac"]').id = `adv-vac-${i}`;
+        card.querySelector('.month-sub').id         = `adv-sub-${i}`;
+        card.querySelectorAll('.btn-step').forEach(btn => btn.dataset.month = i);
+        container.appendChild(fragment);
     }
 }
 

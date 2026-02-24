@@ -9,35 +9,18 @@ let periodCount = 0;
 function addPeriod(startVal, endVal, hoVal, vacVal, sickVal) {
     periodCount++;
     const id = periodCount;
-    const item = document.createElement('div');
-    item.className = 'period-item';
+    const tmpl = document.getElementById('tmpl-period');
+    const fragment = tmpl.content.cloneNode(true);
+    const item = fragment.querySelector('.period-item');
     item.id = `period-${id}`;
-    item.innerHTML = `
-        <span class="period-num">Zeitraum ${id}</span>
-        <div style="width:100%; display:flex; flex-wrap:wrap; gap:6px; margin-bottom:4px;" class="period-quick"></div>
-        <div class="form-group">
-            <label>Startdatum</label>
-            <input type="date" class="p-start" value="${startVal || ''}" required>
-        </div>
-        <div class="form-group">
-            <label>Enddatum</label>
-            <input type="date" class="p-end" value="${endVal || ''}" required>
-        </div>
-        <div class="form-group">
-            <label>HO-Tage</label>
-            <input type="number" class="p-ho" min="0" value="${hoVal != null ? hoVal : 0}">
-        </div>
-        <div class="form-group">
-            <label>Urlaubstage</label>
-            <input type="number" class="p-vac" min="0" value="${vacVal != null ? vacVal : 0}">
-        </div>
-        <div class="form-group">
-            <label>Krankheitstage</label>
-            <input type="number" class="p-sick" min="0" value="${sickVal != null ? sickVal : 0}">
-        </div>
-        <button type="button" class="btn-remove-period" data-period-id="${id}" title="Zeitraum entfernen">-</button>
-    `;
-    document.getElementById('periodList').appendChild(item);
+    item.querySelector('.period-num').textContent = `Zeitraum ${id}`;
+    item.querySelector('.btn-remove-period').dataset.periodId = id;
+    item.querySelector('.p-start').value = startVal || '';
+    item.querySelector('.p-end').value   = endVal   || '';
+    item.querySelector('.p-ho').value    = hoVal  != null ? hoVal  : 0;
+    item.querySelector('.p-vac').value   = vacVal != null ? vacVal : 0;
+    item.querySelector('.p-sick').value  = sickVal != null ? sickVal : 0;
+    document.getElementById('periodList').appendChild(fragment);
     refreshPeriodNumbers();
     if (typeof savePlanerState === 'function') savePlanerState();
 }

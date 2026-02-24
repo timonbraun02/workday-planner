@@ -296,6 +296,53 @@
         </div>
     </div>
 
+    <template id="tmpl-period">
+      <div class="period-item">
+        <span class="period-num"></span>
+        <div class="period-quick"></div>
+        <div class="form-group">
+          <label>Startdatum</label>
+          <input type="date" class="p-start" required>
+        </div>
+        <div class="form-group">
+          <label>Enddatum</label>
+          <input type="date" class="p-end" required>
+        </div>
+        <div class="form-group">
+          <label>HO-Tage</label>
+          <input type="number" class="p-ho" min="0" value="0">
+        </div>
+        <div class="form-group">
+          <label>Urlaubstage</label>
+          <input type="number" class="p-vac" min="0" value="0">
+        </div>
+        <div class="form-group">
+          <label>Krankheitstage</label>
+          <input type="number" class="p-sick" min="0" value="0">
+        </div>
+        <button type="button" class="btn-remove-period" title="Zeitraum entfernen">-</button>
+      </div>
+    </template>
+
+    <template id="tmpl-month-card">
+      <div class="month-card">
+        <div class="month-name"></div>
+        <div class="month-type-label">HO-Tage</div>
+        <div class="month-stepper">
+          <button class="btn-step" data-type="ho" data-delta="-1">−</button>
+          <div class="month-value" data-role="ho">0</div>
+          <button class="btn-step" data-type="ho" data-delta="1">+</button>
+        </div>
+        <div class="month-type-label">Urlaub</div>
+        <div class="month-stepper">
+          <button class="btn-step" data-type="vac" data-delta="-1">−</button>
+          <div class="month-value" data-role="vac">0</div>
+          <button class="btn-step" data-type="vac" data-delta="1">+</button>
+        </div>
+        <div class="month-sub">0/– Tage</div>
+      </div>
+    </template>
+
     <script src="js/holidays.js"></script>
     <script src="js/app.js"></script>
     <script src="js/planner.js"></script>
