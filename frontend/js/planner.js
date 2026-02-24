@@ -256,6 +256,8 @@ function planerReset() {
     const btnToggle = document.getElementById('btnDetailsToggle');
     if (details) details.classList.remove('open');
     if (btnToggle) { btnToggle.classList.remove('open'); btnToggle.textContent = 'Details anzeigen'; }
+    // Erweiterte Optionen zuklappen
+    closeAdvancedOptions();
     // Default-Zeitraum erstellen
     const today = new Date().toISOString().split('T')[0];
     const yearEnd = `${new Date().getFullYear()}-12-31`;
@@ -305,6 +307,10 @@ document.getElementById('fourDayWeek').addEventListener('change', savePlanerStat
         : [{ start: new Date().toISOString().split('T')[0], end: `${new Date().getFullYear()}-12-31`, ho: 0, vac: 0, sick: 0 }];
 
     periods.forEach(p => addPeriod(p.start, p.end, p.ho, p.vac, p.sick));
+
+    // Erweiterte Optionen automatisch öffnen wenn nötig
+    const shouldOpen = periods.length > 1 || (saved && saved.fourDay);
+    if (shouldOpen) openAdvancedOptions();
 })();
 
 // Event Delegation – Zeitraum entfernen
@@ -321,6 +327,37 @@ document.getElementById('periodList').addEventListener('click', (e) => {
 
 // Event Listener – Zeitraum hinzufügen
 document.getElementById('btnAddPeriod').addEventListener('click', () => addPeriod());
+
+// Advanced Options: Hilfsfunktionen
+function openAdvancedOptions() {
+    const content = document.getElementById('advancedOptionsContent');
+    const btn     = document.getElementById('btnAdvancedOptions');
+    if (!content || !btn) return;
+    content.classList.add('open');
+    btn.classList.add('open');
+    const lbl = btn.querySelector('span');
+    if (lbl) lbl.textContent = 'Erweiterte Optionen ausblenden';
+}
+
+function closeAdvancedOptions() {
+    const content = document.getElementById('advancedOptionsContent');
+    const btn     = document.getElementById('btnAdvancedOptions');
+    if (!content || !btn) return;
+    content.classList.remove('open');
+    btn.classList.remove('open');
+    const lbl = btn.querySelector('span');
+    if (lbl) lbl.textContent = 'Erweiterte Optionen';
+}
+
+// Event Listener – Erweiterte Optionen Toggle
+document.getElementById('btnAdvancedOptions').addEventListener('click', () => {
+    const content = document.getElementById('advancedOptionsContent');
+    if (content.classList.contains('open')) {
+        closeAdvancedOptions();
+    } else {
+        openAdvancedOptions();
+    }
+});
 
 // Event Listener – Planer zurücksetzen
 document.getElementById('btnPlanerReset').addEventListener('click', planerReset);

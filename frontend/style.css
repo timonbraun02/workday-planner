@@ -684,6 +684,65 @@ input[type="checkbox"] {
     color: white;
 }
 
+/* Advanced Options Toggle */
+.advanced-options {
+    margin-top: 12px;
+    margin-bottom: 16px;
+}
+
+.btn-advanced-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+}
+
+.btn-advanced-toggle:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+}
+
+.btn-advanced-toggle::after {
+    content: '▸';
+    display: inline-block;
+    transition: transform 0.25s ease;
+    font-size: 0.8rem;
+}
+
+.btn-advanced-toggle.open::after {
+    transform: rotate(90deg);
+}
+
+.advanced-options-content {
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height 0.35s ease, opacity 0.3s ease;
+}
+
+.advanced-options-content.open {
+    max-height: 300px;
+    opacity: 1;
+}
+
+.advanced-options-content > * {
+    margin-top: 12px;
+}
+
+.option-hint {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-top: -4px !important;
+    line-height: 1.4;
+}
+
 /* Details-Toggle */
 .btn-details-toggle {
     display: inline-flex;

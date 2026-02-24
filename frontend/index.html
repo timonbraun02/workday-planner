@@ -54,15 +54,23 @@
 
                     <!-- Dynamische Zeitraum-Liste -->
                     <div class="period-list" id="periodList"></div>
-                    <button type="button" class="btn-add-period" id="btnAddPeriod">
-                        + Zeitraum hinzufügen
-                    </button>
                 </div>
 
-                <div class="form-section" style="margin-bottom: 10px;">
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="fourDayWeek">
-                        <label for="fourDayWeek" style="margin-bottom: 0;">4-Tage-Woche aktivieren</label>
+                <div class="advanced-options">
+                    <button type="button" class="btn-advanced-toggle" id="btnAdvancedOptions">
+                        <span>Erweiterte Optionen</span>
+                    </button>
+                    <div class="advanced-options-content" id="advancedOptionsContent">
+                        <button type="button" class="btn-add-period" id="btnAddPeriod">
+                            + Zeitraum hinzufügen
+                        </button>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="fourDayWeek">
+                            <label for="fourDayWeek">4-Tage-Woche aktivieren</label>
+                        </div>
+                        <p class="option-hint">
+                            Pro Arbeitswoche wird ein Tag abgezogen. Sinnvoll wenn du z.B. freitags generell nicht arbeitest.
+                        </p>
                     </div>
                 </div>
 
