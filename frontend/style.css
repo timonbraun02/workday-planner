@@ -567,6 +567,19 @@ input[type="checkbox"] {
     cursor: grabbing;
 }
 
+#advMonthControls {
+    display: none;
+}
+
+#advMonthControls.open {
+    display: grid;
+    margin-top: 12px;
+}
+
+#btnMonthCardsToggle {
+    margin-top: 16px;
+}
+
 .month-controls {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));

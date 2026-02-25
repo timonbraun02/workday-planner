@@ -683,6 +683,15 @@ document.getElementById('advMonthControls').addEventListener('click', (e) => {
 // Event Listener – Advanced Reset
 document.getElementById('btnAdvReset').addEventListener('click', advReset);
 
+// Event Listener – Monats-Karten Toggle
+document.getElementById('btnMonthCardsToggle').addEventListener('click', () => {
+    const btn      = document.getElementById('btnMonthCardsToggle');
+    const controls = document.getElementById('advMonthControls');
+    const isOpen   = controls.classList.toggle('open');
+    btn.classList.toggle('open', isOpen);
+    btn.textContent = isOpen ? t('hideMonthCards') : t('showMonthCards');
+});
+
 /* =========================================================
    EXPORT / IMPORT
    ========================================================= */

@@ -55,6 +55,8 @@ const I18N = {
     weeksWithDouble: 'Wochen mit 2× Büro',
     showDetails: 'Details anzeigen',
     hideDetails: 'Details ausblenden',
+    showMonthCards: 'Monatsdetails anzeigen',
+    hideMonthCards: 'Monatsdetails ausblenden',
     transferBudget: 'HO-Tage in Monatsplanung übernehmen',
     days: 'Tage',
     weeks: 'Wochen',
@@ -171,6 +173,8 @@ const I18N = {
     weeksWithDouble: 'Weeks with 2× office',
     showDetails: 'Show details',
     hideDetails: 'Hide details',
+    showMonthCards: 'Show monthly details',
+    hideMonthCards: 'Hide monthly details',
     transferBudget: 'Transfer HO days to monthly planning',
     days: 'days',
     weeks: 'weeks',
@@ -333,6 +337,15 @@ function applyLanguage() {
     const detailsOpen = document.getElementById('resultsDetails');
     if (detailsOpen) {
       detailsBtn.textContent = detailsOpen.classList.contains('open') ? t('hideDetails') : t('showDetails');
+    }
+  }
+
+  // Monats-Karten Toggle Text aktualisieren
+  const monthCardsBtn = document.getElementById('btnMonthCardsToggle');
+  if (monthCardsBtn) {
+    const monthControls = document.getElementById('advMonthControls');
+    if (monthControls) {
+      monthCardsBtn.textContent = monthControls.classList.contains('open') ? t('hideMonthCards') : t('showMonthCards');
     }
   }
 
