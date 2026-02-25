@@ -105,6 +105,10 @@ const I18N = {
     advVacation: 'Urlaub',
     advDaysOf: '{0}/{1} Tage',
     advReset: 'Zurücksetzen',
+    advExport: 'Exportieren',
+    advImport: 'Importieren',
+    advImportError: 'Die Datei konnte nicht importiert werden. Bitte eine gültige Monatsplanung-JSON-Datei wählen.',
+    advImportSuccess: 'Daten erfolgreich importiert.',
 
     // Errors
     errorStartBeforeEnd: 'Startdatum muss vor dem Enddatum liegen',
@@ -217,6 +221,10 @@ const I18N = {
     advVacation: 'Vacation',
     advDaysOf: '{0}/{1} days',
     advReset: 'Reset',
+    advExport: 'Export',
+    advImport: 'Import',
+    advImportError: 'Could not import file. Please select a valid monthly planning JSON file.',
+    advImportSuccess: 'Data imported successfully.',
 
     // Errors
     errorStartBeforeEnd: 'Start date must be before end date',

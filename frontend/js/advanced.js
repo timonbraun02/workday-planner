@@ -683,6 +683,107 @@ document.getElementById('advMonthControls').addEventListener('click', (e) => {
 // Event Listener – Advanced Reset
 document.getElementById('btnAdvReset').addEventListener('click', advReset);
 
+/* =========================================================
+   EXPORT / IMPORT
+   ========================================================= */
+
+// Export
+document.getElementById('btnAdvExport').addEventListener('click', function () {
+    const year = advGetYear();
+    const data = {
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        year: year,
+        budget: advGetBudget(),
+        bundesland: document.getElementById('bundesland').value,
+        hoDays: advData.hoDays.slice(),
+        vacDays: advData.vacDays.slice()
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'monatsplanung-' + year + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+});
+
+// Import – Trigger file picker
+document.getElementById('btnAdvImport').addEventListener('click', function () {
+    document.getElementById('advFileInput').click();
+});
+
+// Import – File reader
+document.getElementById('advFileInput').addEventListener('change', function () {
+    const file = this.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        let parsed;
+        try {
+            parsed = JSON.parse(e.target.result);
+        } catch (err) {
+            alert(typeof t === 'function' ? t('advImportError') : 'Die Datei konnte nicht importiert werden.');
+            document.getElementById('advFileInput').value = '';
+            return;
+        }
+
+        // Validation
+        const isValidArray12 = (arr) =>
+            Array.isArray(arr) &&
+            arr.length === 12 &&
+            arr.every(v => typeof v === 'number' && v >= 0);
+
+        if (parsed.version == null) {
+            alert(typeof t === 'function' ? t('advImportError') : 'Die Datei konnte nicht importiert werden.');
+            document.getElementById('advFileInput').value = '';
+            return;
+        }
+        if (!isValidArray12(parsed.hoDays)) {
+            alert(typeof t === 'function' ? t('advImportError') : 'Die Datei konnte nicht importiert werden.');
+            document.getElementById('advFileInput').value = '';
+            return;
+        }
+        if (!isValidArray12(parsed.vacDays)) {
+            alert(typeof t === 'function' ? t('advImportError') : 'Die Datei konnte nicht importiert werden.');
+            document.getElementById('advFileInput').value = '';
+            return;
+        }
+        if (typeof parsed.year !== 'number' || parsed.year < 2020 || parsed.year > 2040) {
+            alert(typeof t === 'function' ? t('advImportError') : 'Die Datei konnte nicht importiert werden.');
+            document.getElementById('advFileInput').value = '';
+            return;
+        }
+        if (typeof parsed.budget !== 'number' || parsed.budget < 0) {
+            alert(typeof t === 'function' ? t('advImportError') : 'Die Datei konnte nicht importiert werden.');
+            document.getElementById('advFileInput').value = '';
+            return;
+        }
+
+        // Apply data
+        advData.hoDays  = parsed.hoDays.slice();
+        advData.vacDays = parsed.vacDays.slice();
+        document.getElementById('advYear').value   = parsed.year;
+        document.getElementById('advBudget').value = parsed.budget;
+
+        if (parsed.bundesland != null) {
+            const blSelect = document.getElementById('bundesland');
+            blSelect.value = parsed.bundesland;
+            if (typeof savePlanerState === 'function') savePlanerState();
+        }
+
+        advUpdateAll();
+        saveAdvState();
+
+        alert(typeof t === 'function' ? t('advImportSuccess') : 'Daten erfolgreich importiert.');
+        document.getElementById('advFileInput').value = '';
+    };
+    reader.readAsText(file);
+});
+
 // Globale Exposition (nur was von anderen Modulen benötigt wird)
 window.advUpdateAll = advUpdateAll;
 window.advDrawChart = advDrawChart;

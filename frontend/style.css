@@ -475,6 +475,16 @@ input[type="checkbox"] {
     min-width: 160px;
 }
 
+.adv-io-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-io {
+    padding: 10px 16px;
+    font-size: 0.85rem;
+}
+
 .adv-budget {
     display: flex;
     flex-wrap: wrap;
