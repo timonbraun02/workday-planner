@@ -10,6 +10,19 @@ function setEndNow() {
     document.getElementById('workEnd').value = `${h}:${m}`;
 }
 
+function setEndWorkday() {
+    const start = document.getElementById('workStart').value;
+    const targetHoursVal = document.getElementById('targetHours').value;
+    if (!start || targetHoursVal === '') return;
+    const [sh, sm] = start.split(':').map(Number);
+    const targetMin = Math.round(parseFloat(targetHoursVal) * 60);
+    const breakMin = parseInt(document.getElementById('breakMinutes').value) || 0;
+    const endTotalMin = sh * 60 + sm + targetMin + breakMin;
+    const eh = Math.floor(endTotalMin / 60) % 24;
+    const em = endTotalMin % 60;
+    document.getElementById('workEnd').value = `${String(eh).padStart(2, '0')}:${String(em).padStart(2, '0')}`;
+}
+
 function formatMinutes(totalMinutes) {
     const h = Math.floor(totalMinutes / 60);
     const m = totalMinutes % 60;
@@ -124,4 +137,5 @@ window.formatMinutes   = formatMinutes;
 
 // Event Listeners
 document.getElementById('btnSetEndNow').addEventListener('click', setEndNow);
+document.getElementById('btnSetEndWorkday').addEventListener('click', setEndWorkday);
 document.getElementById('btnZeitrechnerReset').addEventListener('click', zeitrechnerReset);
