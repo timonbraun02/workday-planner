@@ -132,6 +132,16 @@ function formatMinutes(totalMinutes) {
     return `${h}:${String(m).padStart(2, '0')}`;
 }
 
+/** Formatiert Minuten als Dezimalzahl (z.B. 7,50) oder H:MM – je nach Modus */
+function displayMinutes(totalMinutes) {
+    if (isDecimalMode()) {
+        const decimal = totalMinutes / 60;
+        const lang = localStorage.getItem('wp_lang') || 'de';
+        return decimal.toFixed(2).replace('.', lang === 'de' ? ',' : '.');
+    }
+    return formatMinutes(totalMinutes);
+}
+
 document.getElementById('timeForm').addEventListener('submit', (e) => {
     e.preventDefault();
 
@@ -174,9 +184,9 @@ document.getElementById('timeForm').addEventListener('submit', (e) => {
         warningDiv.classList.remove('show');
     }
 
-    document.getElementById('grossTime').textContent = formatMinutes(grossMinutes);
-    document.getElementById('breakTime').textContent = formatMinutes(breakMin);
-    document.getElementById('netTime').textContent = formatMinutes(netMinutes);
+    document.getElementById('grossTime').textContent = displayMinutes(grossMinutes);
+    document.getElementById('breakTime').textContent = displayMinutes(breakMin);
+    document.getElementById('netTime').textContent = displayMinutes(netMinutes);
 
     // Sollzeit-Vergleich
     const targetHoursVal = document.getElementById('targetHours').value;
@@ -187,10 +197,10 @@ document.getElementById('timeForm').addEventListener('submit', (e) => {
         const absMin     = Math.abs(deltaMin);
         const sign       = deltaMin >= 0 ? '+' : '−';
         const valueEl    = document.getElementById('overtimeValue');
-        valueEl.textContent = `${sign}${formatMinutes(absMin)} h`;
+        valueEl.textContent = `${sign}${displayMinutes(absMin)} h`;
         valueEl.className   = 'overtime-value ' + (deltaMin > 0 ? 'positive' : deltaMin < 0 ? 'negative' : 'neutral');
-        document.getElementById('targetDisplay').textContent  = formatMinutes(targetMin);
-        document.getElementById('netTimeDisplay').textContent = formatMinutes(netMinutes);
+        document.getElementById('targetDisplay').textContent  = displayMinutes(targetMin);
+        document.getElementById('netTimeDisplay').textContent = displayMinutes(netMinutes);
         overtimeCard.style.display = 'block';
     } else {
         overtimeCard.style.display = 'none';
