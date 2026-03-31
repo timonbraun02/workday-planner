@@ -73,6 +73,9 @@ const I18N = {
 
     // Zeitrechner
     timeCalcTitle: 'Arbeitszeit berechnen',
+    decimalTimeToggle: 'Dezimalzeit-Eingabe',
+    decimalTimeHint: 'Zeit als Dezimalzahl eingeben (z.\u202FB. 7,5 = 7:30 Uhr)',
+    decimalPlaceholder: 'z.B. 7,5',
     workStart: 'Arbeitsbeginn',
     workEnd: 'Arbeitsende',
     now: 'Jetzt',
@@ -192,6 +195,9 @@ const I18N = {
 
     // Time calculator
     timeCalcTitle: 'Calculate working time',
+    decimalTimeToggle: 'Decimal time input',
+    decimalTimeHint: 'Enter time as decimal number (e.g. 7.5 = 7:30)',
+    decimalPlaceholder: 'e.g. 7.5',
     workStart: 'Work start',
     workEnd: 'Work end',
     now: 'Now',

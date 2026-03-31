@@ -247,19 +247,24 @@ label {
 input[type="date"],
 input[type="number"],
 input[type="time"],
+input[type="text"],
 select {
     padding: 12px;
     border: 2px solid var(--border-color);
     border-radius: 8px;
     font-size: 1rem;
+    font-family: inherit;
     transition: border-color 0.3s, background 0.3s, color 0.3s;
     background: var(--bg-input);
     color: var(--text-primary);
+    width: 100%;
+    box-sizing: border-box;
 }
 
 input[type="date"]:focus,
 input[type="number"]:focus,
 input[type="time"]:focus,
+input[type="text"]:focus,
 select:focus {
     outline: none;
     border-color: var(--accent);
@@ -270,6 +275,19 @@ select:focus {
     align-items: center;
     gap: 10px;
     margin: 15px 0;
+}
+
+.decimal-toggle {
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+
+.decimal-toggle .decimal-hint {
+    flex-basis: 100%;
+    margin: 0;
+    padding-left: 30px;
+    font-size: 0.82rem;
+    color: var(--text-muted);
 }
 
 input[type="checkbox"] {
