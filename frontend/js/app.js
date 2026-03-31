@@ -8,6 +8,8 @@ function toggleDarkMode() {
     const isDark = document.body.classList.contains('dark');
     localStorage.setItem('darkMode', isDark);
     document.getElementById('themeBtn').innerHTML = isDark ? '&#9788;' : '&#9790;';
+    // Canvas-Chart im Advanced-Tab mit neuen Farben neu zeichnen
+    if (typeof advDrawChart === 'function') advDrawChart();
 }
 
 (function initTheme() {
