@@ -76,7 +76,6 @@ body.dark {
 
 * {
     margin: 0;
-    overscroll-behavior: none;
     padding: 0;
     box-sizing: border-box;
 }
@@ -98,7 +97,7 @@ body {
     background: var(--bg-container);
     border-radius: 16px;
     box-shadow: var(--shadow-container);
-    overflow: hidden;
+    overflow: clip;
     transition: background 0.3s;
 }
 
