@@ -75,12 +75,12 @@ function applyDecimalMode() {
         startEl.type = 'text';
         startEl.inputMode = 'decimal';
         startEl.placeholder = t('decimalPlaceholder');
-        startEl.pattern = '[0-9]{1,2}[,\\.][0-9]{0,2}';
+        startEl.removeAttribute('pattern');
 
         endEl.type = 'text';
         endEl.inputMode = 'decimal';
         endEl.placeholder = t('decimalPlaceholder');
-        endEl.pattern = '[0-9]{1,2}[,\\.][0-9]{0,2}';
+        endEl.removeAttribute('pattern');
 
         if (startVal) startEl.value = timeToDecimalStr(startVal);
         if (endVal)   endEl.value   = timeToDecimalStr(endVal);
@@ -245,6 +245,20 @@ function zeitrechnerReset() {
 
 // Dezimalzeit-Toggle Event
 document.getElementById('decimalTimeToggle').addEventListener('change', applyDecimalMode);
+
+/** Normalisiert Dezimaleingaben beim Verlassen des Feldes (z.B. "6" → "6,00") */
+function normalizeDecimalInput(e) {
+    if (!isDecimalMode()) return;
+    const val = e.target.value.trim();
+    if (!val) return;
+    const parsed = parseDecimalTime(val);
+    if (!parsed) return;
+    const decimal = parsed.h + parsed.m / 60;
+    const lang = localStorage.getItem('wp_lang') || 'de';
+    e.target.value = decimal.toFixed(2).replace('.', lang === 'de' ? ',' : '.');
+}
+document.getElementById('workStart').addEventListener('blur', normalizeDecimalInput);
+document.getElementById('workEnd').addEventListener('blur', normalizeDecimalInput);
 
 // Globale Exposition
 window.formatMinutes   = formatMinutes;

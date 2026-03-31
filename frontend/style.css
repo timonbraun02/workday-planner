@@ -282,12 +282,34 @@ select:focus {
     margin-bottom: 8px;
 }
 
-.decimal-toggle .decimal-hint {
-    flex-basis: 100%;
-    margin: 0;
-    padding-left: 30px;
-    font-size: 0.82rem;
+.decimal-info {
+    position: relative;
+    cursor: help;
+    font-size: 1rem;
     color: var(--text-muted);
+    line-height: 1;
+}
+
+.decimal-tooltip {
+    display: none;
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 8px);
+    transform: translateX(-50%);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.82rem;
+    white-space: nowrap;
+    box-shadow: var(--shadow-card);
+    z-index: 10;
+    pointer-events: none;
+}
+
+.decimal-info:hover .decimal-tooltip {
+    display: block;
 }
 
 input[type="checkbox"] {
